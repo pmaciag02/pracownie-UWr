@@ -1,0 +1,16 @@
+#lang racket
+
+
+
+
+(define (parse-with-rule grammar rule toks)
+  (match rule
+    ['() (parse-ok '() toks)]
+    [(cons item rule)
+     (match (parse-item grammar item toks)
+       [(parse-ok xs1 toks)
+        (match (parse-with-rule grammar rule toks)
+          [(parse-ok xs2 toks)
+           (parse-ok (append xs1 xs2) toks)]
+          [#f #f])]
+       [#f #f])]))

@@ -1,0 +1,190 @@
+Szyfr asymetryczny
+Szyfrowanie asymetryczne charakteryzuje się tym, że istnieją w nim dwa klucze - publiczny i prywatny.  Wszystko co zostanie zaszyfrowane przy pomocy klucza publicznego, można odszyfrować tylko i wyłącznie posiadając klucz prywatny, podobnie w drugą stronę - wszystko co odszyfrowane przy pomocy klucza publicznego daje jakieś sensowne dane musiało zostać zaszyfrowane kluczem prywatnym. Ważne jest także, że uzyskanie klucza prywatnego z publicznego jest trudne obliczeniowo(w praktyce niemożliwe do policzenia).
+
+Sumaryczne daje to dwa potężne zastosowania kluczowe w dzisiejszym bezpieczeństwie (korzysta z nich niemal wszystko co musi zapewnić bezpieczeństwo lub poufność szczególnie w sieci m.in. https, ssh, kryptowaluty w tym bitcoin, podpisy elektroniczne itd.):
+
+Załóżmy, że Alicja chce by Bob, Cezary i inni znajomi mogli poufnie przekazać jej informacje tak by żaden podsłuchujący(w szczególności wścibska Ewa, siostra Alicji, która czyta wszystkie jej wiadomości) nie mógł nic z konwersacji wywnioskować. Tworzy wtedy dwa powiązane ze sobą klucze: prywatny i publiczny, publiczny daje tym osobom(oczywiście Ewa też go otrzymuje). Wtedy osoba chcąca wysłać wiadomość do Alicji przed wysłaniem szyfruje ją kluczem publicznym. Alicja potrafi ją odszyfrować - ma klucz prywatny, jednak Ewa, ani nikt inny nie da rady. (w praktyce najczęściej wysyła się tym sposobem zaszyfrowany klucz do szyfru symetrycznego, którym szyfruje się resztę wiadomości)
+Drugi scenariusz - powiedzmy że Alicja chciałaby udowodnić, że jest sobą - tzn. podpisać się cyfrowo. Pisze wtedy jakąś wiadomość i szyfruje ją za pomocą klucza prywatnego. Każdy kto ma klucz publiczny jest w stanie ją odczytać, jednak ma pewność że napisała ją Alicja, bo nikt kto nie ma klucza prywatnego nie dałby rady wysłać tak zaszyfrowanej wiadomości. (w rzeczywistości przesyła się wiadomość z zaszyfrowanym asymetrycznie skrótem/hashem)
+Obecnie używa się głównie kilku rodzajów szyfru asymetrycznego - opartych na trudności rozkładu dużych liczb na czynniki pierwsze, trudności logarytmu dyskretnego oraz o krzywe eliptyczne. Dzisiaj zajmiemy się ważnym algorytmem szyfrującym RSA bazującym na trudności rozkładu liczby na czynniki pierwsze. 
+
+Zadanie
+Pomimo dość obszernego wstępu zadanie ułożone jest progresywnie, tak by kroczkami za które można dostać częściową punktację zbliżać się do działającego uproszczonego algorytmu RSA. Nie wszystkie kroki są od siebie zależne i można pominąć niektóre, a zrobić inne.
+
+Należy napisać program, który w pierwszej linii wczytuje liczbę - ilość komend(<1000), a w każdej następnej jedną komendę i wypisuje dla niej jedną linię odpowiedzi.
+
+Część 1 - gcd i lcm, algorytm Euklidesa(3pkt)
+Dla komendy:
+GCD a b
+Program powinien wypisać największy wspólny dzielnik a i b, podobnie dla komendy:
+LCM a b
+Powinien wypisać ich najmniejszą wspólną wielokrotność (obie funkcje łączy prosty wzór - lepiej najpierw dzielić potem mnożyć - pozwala na większy zakres liczb).
+Żadna z liczb ani wynik działania nie przekracza 10^18 (mieści się z typie 64-bitowym).
+Testy 1-3
+
+Część 2 - rozszerzony algorytm Euklidesa (3 pkt)
+Dla komendy:
+GCDE a b
+Program powinien wypisać 3 liczby:
+g p q
+takie, że g = gcd(a,b), a p,q są takie, że  p*a+q*b = gcd(a,b) (czyli rozwiązuje tożsamość Bezouta).
+Żadna z liczb ani wynik działania nie przekracza 10^18 (mieści się z typie 64-bitowym).
+Testy 4-5
+
+Część 3 - szybkie potęgowanie modulo (3 pkt)
+Dla komendy:
+POWMOD a e m
+Program powinien zwrócić a^e mod m .
+Ze względu na limity danych należy zadbać o to by algorytm potęgujący był algorytmem szybkiego potęgowania. Operację modulo należy wykonać przy każdym mnożeniu. Wolny algorytm potęgowanie powinien dostać 1 punkt, szybki 3pkt.
+Liczby a,m nie przekraczają 10^9 (mieszczą się z typie 32-bitowym), e nie przekracza 10^18, wszystkie są dodatnie.
+Testy 6-7
+
+Część 4 - generacja klucza publicznego i prywatnego na podstawie dwóch liczby pierwszych(3pkt) - zależne od cz.1,2
+Bazując na algorymie z angielskiej wikipedii(https://en.wikipedia.org/wiki/RSA_(cryptosystem)), pokrótce:
+
+n = pq
+λ = lcm(p-1,q-1)
+e to (na potrzeby zadania) najmniejsza liczba większa/równa od 3 t.że gcd(e,λ) == 1;
+d to taka liczba, że d*e = 1 mod λ, czyli inaczej d*e + k λ = gcd(e,λ) dla pewnego k, zatem można obliczyć je z gcde(część 2)
+klucz publiczny to para (n,e), prywatyny (n,d)
+Dla komend:
+
+PRIVKEY p q
+PUBKEY p q
+program powinien zwrócić odpowiednio
+
+n e
+n d
+
+Liczby p i q są takie, że p*q < 2*10^18.
+Testy 8-9.
+
+Część 5 - szyfrowanie i deszyfrowanie ciągu liczb (3pkt) - zależne od cz.3
+Odsyłam do Wikipedii( https://pl.wikipedia.org/wiki/RSA_(kryptografia) )
+Dla komend:
+
+ENCRYPT n e t a_1 a_2 a_3 ... a_t
+DECRYPT n d t a_1 a_2 a_3 ... a_t
+Parametrami są części klucza odpowiednio (n,e) i (n,d), następnie ilość liczb do zaszyfrowania(typu unsigned int) i ciąg tych liczb oddzielonych spacjami. Ograniczenia: n<2*10^9, 0<=a_i<n, t<100.
+Komenda powinna zwrócić t kolejnych liczby przekształconych przez klucz RSA, zaszyfrowanych lub odszyfrowanych zależnie od wersji.
+Uwaga! W praktyce w tym programie funkcja encrypt działa tak samo jak decrypt.
+Testy 10-11.
+
+Przykład
+Wejście:
+
+12
+GCD 24 36
+LCM 24 36
+GCD 4337609 1247861
+GCD 4337608 1247860
+PUBKEY 4337609 1247861
+PRIVKEY 4337609 1247861
+PUBKEY 7 19
+PRIVKEY 7 19
+PRIVKEY 50021 20011
+PUBKEY 50021 20011
+ENCRYPT 1000970231 42895723 4 123 1782 130 123
+DECRYPT 1000970231 7 4 778559742 780023431 390379079 778559742
+Wyjście:
+
+12
+72
+1
+4
+5412733104349 3
+5412733104349 902121253147
+133 5
+133 11
+1000970231 42895723
+1000970231 7
+778559742 780023431 390379079 778559742 
+123 1782 130 123
+Komentarz i drobne ciekawostki:
+Ze względu na prostotę zadania liczby pierwsze na których operujemy są stosunkowo małe w porównaniu do prawdziwych zastosowań RSA. Liczby 32 i 64-bitowe bardzo łatwo rozłożyć na czynniki pierwsze (odzyskać p i q na podstawie n, a zatem również wygenerować klucz prywatny)  , najprawdopodobniej zadziała nawet brutalna metoda sprawdzania podzielności przez każdą liczbę aż do pierwiastka. Z oczywistych względów taka metoda nie może zadziałać gdy pierwiastek ma kilkadziesiąt/kilkaset cyfr. W praktyce stosuje się RSA 2048,3072,4096-bitów. Dla przykładu tak wyglądają liczby pierwsze i ich iloczyn wytworzone przez openssl(zapisane szesnastkowo) dla kluczy 3072-bitów:
+
+modulus(n):
+ 00:c1:54:c6:4d:92:1e:dc:00:41:d1:fe:84:df:58:
+ 42:b2:ed:72:78:1d:57:88:70:96:3b:f9:8b:1b:c1:
+ 58:c0:86:c2:b9:5d:4e:2b:da:93:5c:4b:64:5f:0f:
+ f0:b9:3e:c1:d7:52:d7:0d:e4:07:6a:3c:aa:d9:de:
+ ab:7b:8c:e5:1b:06:64:e5:52:6b:86:54:9e:e5:dd:
+ d2:fe:14:f7:5a:39:c0:1d:ab:cd:65:be:44:52:ee:
+ a6:e4:1d:49:19:90:87:d6:75:a5:06:f8:b4:14:8c:
+ 98:e0:d3:03:c5:4a:9c:d0:b7:7d:7b:3a:a7:0d:c5:
+ d3:f0:a3:d3:d6:7f:e9:49:02:a6:c7:86:35:93:7e:
+ 06:0f:0e:ee:b7:b1:dd:72:2d:03:db:29:02:6c:7e:
+ 8c:cd:dc:a6:89:09:91:3b:6d:01:f9:62:61:70:d5:
+ 48:1b:b0:1e:a1:c9:47:2a:27:c9:64:3a:8d:58:db:
+ 4d:14:53:12:a4:45:3d:ee:e2:10:d2:a9:fd:85:52:
+ 2d:69:50:5f:55:0d:3b:84:07:67:15:94:26:f9:16:
+ 44:01:69:56:63:db:00:f3:0c:52:61:1a:36:41:e0:
+ 0a:27:13:48:9b:ad:e0:0c:ee:97:59:cd:a4:89:4c:
+ 27:52:c4:91:2b:9c:11:cb:78:ed:30:bd:45:ad:9c:
+ c3:98:b4:df:d7:26:2f:6d:cb:86:f1:d9:b6:1c:b0:
+ 37:e9:ee:26:de:2d:b2:3b:bf:2c:f1:7a:d8:51:c8:
+ 71:21:ae:2d:96:5a:38:bc:ca:ac:ee:b5:e6:bc:ec:
+ 7b:83:9e:ee:c2:e1:af:a2:3d:33:36:a6:b8:d7:79:
+ b0:74:92:21:ab:b5:59:d2:0d:fd:e1:d1:b7:ca:da:
+ 36:70:c1:dc:44:d0:c1:0b:c8:c6:8b:7b:29:5f:0c:
+ ff:02:ee:7a:df:f6:da:f9:64:61:03:04:bb:da:9f:
+ ee:72:84:51:0a:98:19:b9:2c:ee:ff:3b:d9:b9:d3:
+ 91:3b:3a:b4:c6:e8:34:7a:02:37
+publicExponent(e): 65537 (0x10001)
+privateExponent(d):
+ 00:bb:c2:39:54:dc:b4:5b:b5:64:37:2d:98:9d:d0:
+ 79:f6:8b:e4:c0:02:bf:20:23:37:c4:c7:75:f2:5e:
+ b4:73:46:6d:96:d8:a7:32:af:f4:ad:8e:0a:cc:c8:
+ 0e:61:da:31:27:8d:ac:8e:31:07:82:85:a8:e8:2e:
+ f9:1b:e4:9a:1c:c4:f8:f8:3e:33:6f:22:7f:af:7e:
+ df:8b:23:91:96:6e:bf:c6:11:34:49:bb:9f:5f:6b:
+ a7:69:a3:87:7a:ec:83:00:25:01:40:e4:09:00:6c:
+ 0b:8d:4d:62:3c:19:5a:72:d9:c1:64:0c:72:71:4d:
+ cf:a7:c5:73:d6:be:23:32:65:00:d4:85:e3:42:7b:
+ 02:27:5d:b9:39:6d:e4:43:1e:b4:c0:03:f3:f6:aa:
+ 70:d4:fd:96:3f:40:ab:6b:ab:52:5f:80:cc:61:68:
+ c1:bf:22:2c:9d:b3:7d:09:d3:da:23:1d:3a:69:31:
+ 92:8a:4a:a3:b0:26:0f:20:11:2d:85:6a:d0:bc:3a:
+ db:93:e9:51:f4:ad:4c:c5:5a:e6:bd:06:ca:6c:fe:
+ 92:6d:24:1f:94:be:1a:94:62:9a:7e:ec:8d:97:3d:
+ d5:cb:69:17:93:fa:78:0b:30:94:94:a1:6d:07:c9:
+ c4:98:67:7c:6f:d3:2d:f7:12:9a:84:d2:48:c0:66:
+ a1:5a:e1:35:3d:01:a0:89:c9:28:00:59:a8:dd:93:
+ a3:bd:0d:28:e8:23:cd:52:66:d9:ca:bd:5a:ce:5f:
+ 8d:4d:9a:00:fa:c3:e2:8a:e4:08:b1:23:94:aa:06:
+ 66:57:cb:9b:26:e1:a9:2b:6e:14:18:e1:e7:22:20:
+ 20:fa:a8:55:a1:e0:73:68:7e:57:8a:16:f9:27:e6:
+ 8b:fa:8b:36:5c:83:d3:56:e2:95:87:68:b0:c1:55:
+ 18:67:f5:6c:89:a3:a4:14:d0:3f:f5:c1:8d:0e:31:
+ 17:4a:4f:71:13:ec:ea:2b:30:53:41:d9:00:0a:ca:
+ 27:96:ad:bd:b2:e8:92:c6:0d:01
+prime1(p):
+ 00:e8:b8:a2:fe:8d:f6:f7:7f:12:82:04:ca:bb:79:
+ dc:47:3b:17:bb:c2:b3:08:20:79:51:c7:16:f0:7c:
+ 3a:3a:89:b3:d1:02:f6:08:9c:54:5e:73:c0:49:2c:
+ 96:5c:c1:1d:c9:de:d8:2d:78:4c:9d:a2:47:53:1b:
+ 34:72:f9:3f:3a:24:93:a7:55:dd:11:31:37:cd:46:
+ a0:ae:93:9c:67:1e:35:54:bd:94:59:04:14:35:1b:
+ 09:9d:19:52:66:30:fb:d0:0d:a7:b8:b8:39:12:12:
+ a6:90:69:c7:fa:0c:ab:0b:b6:5c:d2:41:36:b8:9c:
+ b1:35:24:84:68:0c:81:39:48:9f:5d:9d:b5:ad:a3:
+ d8:a2:a5:80:39:9d:12:d6:65:14:02:9d:0d:47:bf:
+ 9a:d1:32:71:32:b7:23:f9:d9:1a:c8:d6:32:81:80:
+ c5:0a:6c:71:ea:28:c7:ae:42:ab:23:d6:21:55:49:
+ d2:e8:8b:26:08:d4:f1:4f:31:34:17:bf:7b
+prime2(q):
+ 00:d4:ab:76:cb:45:47:ae:83:fc:87:52:1a:84:a6:
+ 8d:ac:07:31:80:82:29:a1:1c:8b:28:cf:a9:7a:a0:
+ c4:06:84:e0:88:01:c4:3c:3f:30:46:b4:e3:66:63:
+ 86:bc:79:bd:96:9e:d9:76:4a:43:45:84:b8:0c:4d:
+ 73:9d:8d:a1:31:a2:61:6e:46:19:6d:4b:b9:cd:b0:
+ a6:43:02:37:91:07:e8:50:1c:a0:b1:39:d3:29:ae:
+ cf:d1:26:b5:02:a2:96:fb:f3:61:fa:64:7d:4d:14:
+ 3b:9d:47:4d:17:d9:9f:06:14:7a:45:ea:7b:e2:99:
+ aa:f2:be:f5:1c:92:b0:7e:90:2a:86:00:0c:73:0f:
+ 18:f3:90:c9:63:74:63:97:a1:69:7c:46:b3:d1:93:
+ 6e:77:2d:77:8f:08:cb:20:3a:23:d7:05:89:fe:3a:
+ 34:03:d2:08:53:f2:45:a5:93:9b:04:f3:72:77:2f:
+ 69:a6:61:d4:38:1a:84:24:07:8c:be:cd:75
+Przeimplementowanie programu by działał na tak dużych liczbach wymagałoby zaimplementowania reprezentacji i operacji(+,*,%)  dużych liczb przechowywanych zapewne jako tablice podstawowych typów i działających podobnie do dodawanie/mnożenia pisemnego.
+
+Mała ciekawostka: dotychczas największą rozłożoną liczbą jest liczba 795-bitową (źródło: wiki: Integer Factoring) i raczej nie ma możliwości by rozwój technologiczny komputerów w obecnej postaci mógł znacząco pomóc w rozłożeniu większych liczb. Może natomiast pomóc rozwój algorytmiki oraz rozwój komputerów kwantowych, dla których problem jest prostszy.

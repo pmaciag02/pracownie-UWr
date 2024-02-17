@@ -1,0 +1,30 @@
+<!-- products.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produkty - Nazwa Sklepu</title>
+    <link rel="stylesheet" href="/style.css">
+    <%- include('product-description', locals) %>
+</head>
+<body>
+
+<header>
+    <%- include('header', locals) %>
+</header>
+
+<main>
+    <section class="product-list">
+        <h2>Produkty</h2>
+            <%- include('product-list', locals) %>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Nazwa Sklepu. Wszelkie prawa zastrzeżone.</p>
+</footer>
+
+</body>
+</html>

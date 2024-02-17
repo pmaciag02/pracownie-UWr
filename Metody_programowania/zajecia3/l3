@@ -1,0 +1,79 @@
+#lang racket
+
+;zad.1.
+;(equal? '((car (a . b)) (* 2)) (list '(car (a . b)) '(* 2)))
+
+(equal? '((car (a . b)) (* 2)) (list (list 'car (cons 'a 'b)) (list'* 2)))
+
+(equal? `( ,( car '( a . b ) ) ,(* 2) ) (list `,( car (cons 'a 'b) ) (* 2)))
+
+(equal? '((+ 1 2 3) ( cons ) ( cons a b ) ) (list (list '+ 1 2 3) (list 'cons) (list 'cons 'a 'b)))
+;(list '(+ 1 2 3) '(cons) '(cons a b))
+
+
+;zad.2.
+
+(define (product xs)
+  (if (null? xs)
+      null
+      (foldl * 1 xs)))
+
+;zad.3.
+
+;((lambda (x y) (+ x (* x y))) 1 2)->(+ 1 (* 1 2))->(+ 1 2)->(3)
+
+;((lambda (x) x) (lambda (x) x))->(lambda (x) x)
+
+;((lambda (x) (x x)) (lambda (x) x))->((lambda (x) x) (lambda (x) x))->(lambda (x) x)
+
+;((lambda (x) (x x)) (lambda (x) (x x)))->((lambda (x) (x x)) (lambda (x) (x x)))->((lambda (x) (x x)) (lambda (x) (x x)))->...
+
+;zad.4.
+(define (inc x)
+  (+ x x))
+(define (square x)
+  (* x x))
+
+(define (my-compose x y)
+  (lambda (z) (x (y z))))
+
+;zad.5.
+
+(define (negatives n)
+  (build-list n (lambda (x) (* (+ x 1) -1))))
+
+
+(define (reciprocals n)
+  (build-list n (lambda (x) (/ 1 (+ x 1)))))
+
+
+(define (evens n)
+  (build-list n (lambda (x) (* 2 x))))
+
+
+(define (identityM n)
+  (build-list n (lambda (x) (build-list n (lambda (y) (if (equal? y x) 1 0))))))
+
+
+;(define a (identityM 3))
+
+;zad.6.
+
+(define empty-set
+  (lambda (x) (= x null)))
+
+(define (singleton a)
+  (lambda (x) (= a x)))
+
+
+
+
+;zad.7.
+
+;(n*(n+1))/2 consów
+;(n*(n-1))/2 nieużytków
+
+;wady: czas kwadratowy, sporo nieużytków
+
+;zad.8.
+

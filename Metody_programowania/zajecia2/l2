@@ -1,0 +1,147 @@
+#lang racket
+
+
+;zad.1.
+
+
+(define (fib n)
+  (if (< n 3)
+      1
+      (+ (fib (- n 2)) (fib (- n 1)))))
+
+
+
+(define (fib-iter n)
+  (define (it n f1 f2)
+    (if (< n 3)
+        f2
+        (it (- n 1) f2 (+ f1 f2))))
+  (it n 1 1))
+
+
+
+;zad.2.
+
+
+(define-struct matrix (a b c d))
+
+(define a (matrix 1 2 3 4))
+(define b (matrix 5 6 7 8))
+; k = a * b = (19 22 43 50)
+
+(define (matrix-mult m n)
+  (define (foo x y z q)
+    (+ (* x z) (* y q)))
+  (matrix (foo (matrix-a m) (matrix-b m) (matrix-a n) (matrix-c n)) (foo (matrix-a m) (matrix-b m) (matrix-b n) (matrix-d n)) (foo (matrix-c m) (matrix-d m) (matrix-a n) (matrix-c n)) (foo (matrix-c m) (matrix-d m) (matrix-b n) (matrix-d n))))
+
+(define matrix-id (matrix 1 0 0 1))
+
+(define (silnia n)
+  (if (= n 0)
+      1
+      (* n (silnia (- n 1)))))
+(define (silnia-iter n)
+  (define (it n acc)
+    (if (= n 0)
+        acc
+        (it (- n 1) (* acc n))))
+  (it n 1))
+
+(define (matrix-expt m k)
+  (define (foo m1 m2 kk)
+       (if (= kk 1)
+           m1
+           (foo (matrix-mult m1 m2) m2 (- kk 1))))
+  (if(= k 0)
+     matrix-id
+     (foo m m k)))
+
+(define k (matrix-expt a 3))
+;k = a^3 = (37 54 81 118)
+
+
+
+(define (fib-matrix k)
+  (define m (matrix-expt (matrix 1 1 1 0) k))
+  (matrix-b m))
+
+
+(define l (fib-matrix 10))
+
+
+;zad.3.
+
+(define (matrix-expt-fast m k)
+  (define rez m)
+  (define (foo a b r)
+    (if (= b 0)
+        r
+    (if (integer? (/ b 2))
+    (foo (matrix-mult a a) (floor (/ b 2)) r)
+    (foo (matrix-mult a a) (floor (/ b 2)) (matrix-mult r a)))
+    )
+    )
+  (if (= k 0)
+      matrix-id
+  (foo m (- k 1) rez)))
+
+(define u (matrix-expt-fast a 3))
+
+
+;zad.4.
+
+(define lista (list 1 2 3 4 5))
+
+(define (elem? x xs)
+  (if (equal? (car xs) x)
+      #t
+      (if (null? (cdr xs))
+          #f
+          (elem? x (cdr xs)))))
+
+
+;zad.5.
+
+(define (maximum xs)
+  (define (foo mx lista)
+    (if (null? lista)
+        mx
+        (if (< mx (car lista))
+            (foo (car lista) (cdr lista))
+            (foo mx  (cdr lista)))))
+  (if (null? xs)
+      -inf.0
+      (foo (car xs) xs)))
+
+;zad.6.
+;nie dziala
+(define (suffixes xs)
+  (define lista (list))
+  (define (foo l lista)
+    (if (null? l)
+        (append lista l)
+        (foo (cdr l) (append lista l))))
+  (foo xs lista))
+
+
+;zad.7.
+
+
+(define (sorted? xs)
+  (define (foo i l)
+    (if (null? l)
+        #t
+        (if (> i (car l))
+            #f
+            (foo (car l)  (cdr l)))))
+  (if (null? xs)
+      #t
+      (foo (car xs) xs)))
+
+
+;zad.8.
+
+
+
+
+;zad.9.

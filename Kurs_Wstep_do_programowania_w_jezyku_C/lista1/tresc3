@@ -1,0 +1,32 @@
+Liczbę naturalną większą od 1 nazywamy pierwszą, jeśli dzieli się ona  tylko przez 1 i przez samą siebie. Hipoteza Goldbacha twierdzi, że każdą liczbę parzystą większą niż 2 można przedstawić jako sumę dwóch liczb pierwszych.
+
+Napisać program który weryfikuje tę hipotezę dla podanej liczby, tzn. który czyta liczbę całkowitą n i jeśli n jest jest liczbą parzystą z przedziału [4;100000], to oblicza wszystkie sposoby przedstawienia liczby n jako sumy liczb pierwszych p i q, takich że p <= q i wypisuje je. W przeciwnym przypadku, wypisuje dwa słowa: NIEPOPRAWNA LICZBA i kończy swoje działanie.
+
+Na standardowym wejściu programu, w pierwszym wierszu podana jest liczba całkowita n typu int. Program powinien wypisać na standardowym wyjściu tylko jeden wiersz zawierający na początku albo słowa NIEPOPRAWNA LICZBA (pisane dużymi literami), albo oddzielone spacjami wszystkie pary liczby pierwszych p i q,  takich że: (1) n = p + q i (2) p <= q.
+
+Wskazówka. Każda liczba złożona m ma dzielnik różny od 1 i mniejszy bądź równy pierwiastkowi z m. Tę własność można wykorzystać przy sprawdzaniu pierwszości liczby p >= 3 (podobnie dla q) - wystarczy sprawdzić czy p jest nieparzysta i czy nie dzieli się przez żadną liczbę nieparzystą mniejszą bądź równą pierwiastkowi z p.
+
+Przykład danych 1:
+
+20
+
+Wynik 1:
+
+3 17 7 13
+
+Przykład danych 2:
+
+254
+
+Wynik 2:
+
+3 251 13 241 31 223 43 211 61 193 73 181 97 157 103 151 127 127
+
+Przykład danych 3:
+
+17
+
+Wynik 3:
+
+
+NIEPOPRAWNA LICZBA

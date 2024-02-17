@@ -1,0 +1,46 @@
+\documentclass[a4paper]{article}
+% Kodowanie latain 2
+%\usepackage[latin2]{inputenc}
+\usepackage[T1]{fontenc}
+% Można też użyć UTF-8
+\usepackage[utf8]{inputenc}
+
+% Język
+\usepackage[polish]{babel}
+% \usepackage[english]{babel}
+
+% Rózne przydatne paczki:
+% - znaczki matematyczne
+\usepackage{amsmath, amsfonts}
+% - wcięcie na początku pierwszego akapitu
+\usepackage{indentfirst}
+% - komenda \url 
+\usepackage{hyperref}
+% - dołączanie obrazków
+\usepackage{graphics}
+% - szersza strona
+\usepackage[nofoot,hdivide={2cm,*,2cm},vdivide={2cm,*,2cm}]{geometry}
+\frenchspacing
+% - brak numerów stron
+\pagestyle{empty}
+
+% dane autora
+\author{Patryk Maciąg, 1014656432}
+\title{Przykładowy plik w systemie \LaTeX}
+\date{\today}
+
+% początek dokumentu
+\begin{document}
+\maketitle
+\section{uname -a}
+Skrót od "unix name". Jak nazwa podpowiada, polecenie uname wypisuje informacje o systemie operacyjnym. Samo uname wypisze jedynie nazwę jądra, czyli jeśli korzydtając z linuxa, otrzymasz nazwę Linux. Polecenie uname można teżużywać z różnymi flagami, żeby otrzymać więcej informacji o systremie. Wystarczy użyć flagi -a, żeby otrzymać wszytskie dostępne informacje, takie jak: nazwa jądra i hosta, wydanie jądra, wersja jądra, nazwa sprzętu, nazwa systemu operacyjnego.
+
+\section{Czas uniksowy}
+Zwany też POSIX - rzeczywista liczba sekund, jakie upłynęły od "początku epoki Uniksa", czyli początku roku 1970 (UTC). 
+\section{Problem roku 2038}
+Jest to problem zliczania czasu przez oprogramowania korzystające z czasu uniksowego. Mianowicie dotyczy on osiągnięcia przez licznik sekund swojej maksymalnej wartości, która wynosi \(2147483647\) (ponieważ licznik sekund jest reprezentowany przez 32-bitową liczbę sekund ze znakiem, czyli wartość maksymalna wynosi \(2^{31}-1\)). Wtedy nastąpi powrót wartości licznika do 0, czyli początku 1970, lub nastąpi przeskok do najmniejszej wartości ujemnej.
+\section{Różnice plików}
+Jedyne różnice jakie zauważyłem to pojawienie się zakładek.
+\section{Wzór z Whitebook'a}
+\(\textbf{Zadanie 227. } \bigcup_{n=0}^{\infty}\bigcap_{k=n}^{\infty} A_k\subseteq\bigcap_{n=0}^{\infty}\bigcup_{k=n}^{\infty} A_k\)
+\end{document}

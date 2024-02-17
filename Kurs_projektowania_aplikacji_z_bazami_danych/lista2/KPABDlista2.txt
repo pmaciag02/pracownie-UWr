@@ -1,0 +1,225 @@
+ZAD1
+
+DROP FUNCTION IF EXISTS zad1
+GO
+
+
+CREATE FUNCTION zad1(@liczbaDni int) RETURNS TABLE
+RETURN
+
+SELECT [dbo].[Czytelnik].PESEL, COUNT([dbo].[Wypozyczenie].Wypozyczenie_ID) AS LiczbaEgzemplarzy
+
+FROM [dbo].[Czytelnik], [dbo].[Wypozyczenie]
+
+WHERE [dbo].[Czytelnik].Czytelnik_ID = [dbo].[Wypozyczenie].Czytelnik_ID AND [dbo].[Wypozyczenie].Liczba_Dni >= @liczbaDni
+
+GROUP BY [dbo].[Czytelnik].PESEL
+GO
+
+SELECT * FROM zad1(10)
+GO
+
+
+
+
+
+
+
+
+
+ZAD2
+
+DROP TABLE IF EXISTS firstnames
+DROP TABLE IF EXISTS lastnames
+DROP TABLE IF EXISTS fldata
+DROP PROCEDURE IF EXISTS procfl
+GO
+
+
+
+CREATE TABLE firstnames(id INT PRIMARY KEY, firstname CHAR(10))
+CREATE TABLE lastnames(id INT PRIMARY KEY, lastname CHAR(10))
+CREATE TABLE fldata(firstname CHAR(10), lastname CHAR(10))
+GO
+
+
+
+INSERT INTO firstnames VALUES(1, 'Jan'), (2, 'Adam'), (3, 'Bartek')
+INSERT INTO lastnames VALUES(1, 'Kowalski'), (2, 'Nowak'), (3, 'Materzok')
+GO
+
+
+
+CREATE PROCEDURE procfl @n INT AS
+BEGIN
+    IF (@n > (SELECT COUNT(id) FROM dbo.firstnames) * (SELECT COUNT(id) FROM dbo.lastnames) / 2)
+		BEGIN
+			THROW 50001, 'n > polowa kombinacji', 1;
+		END
+
+    DECLARE @firstname CHAR(10)
+	DECLARE @lastname CHAR(10)
+	
+    DECLARE @i INT
+	SET @i = 1
+    
+	WHILE (@i <= @n)
+	BEGIN
+		
+        SET @firstname = (SELECT TOP 1 firstname FROM firstnames ORDER BY NEWID())
+		SET @lastname = (SELECT TOP 1 lastname FROM lastnames ORDER BY NEWID())
+
+		IF NOT EXISTS (SELECT * FROM fldata WHERE firstname = @firstname AND lastname = @lastname)
+		BEGIN
+			INSERT INTO fldata VALUES(@firstname, @lastname)
+			SET @i = @i + 1
+		END
+	END
+END
+GO
+
+EXEC procfl @n = 3
+GO
+
+SELECT * FROM fldata
+GO
+
+
+
+
+
+
+ZAD3
+
+DROP PROCEDURE IF EXISTS InsertNewReader
+GO
+
+
+CREATE PROCEDURE InsertNewReader @PESEL NVARCHAR(11), @LastName NVARCHAR(10), @BirthDate VARCHAR(10)
+AS
+BEGIN
+    IF NOT LEN(@pesel) = 11 AND ISNUMERIC(@pesel) = 1
+    BEGIN
+        THROW 50001, 'PESEL: invalid format', 1;
+    END
+
+    IF NOT @LastName COLLATE Latin1_General_CI_AI LIKE '[A-Z][a-z][a-z]%'
+    BEGIN
+        THROW 50002, 'last name: invalid format', 1;
+    END
+
+    IF NOT ISDATE(@BirthDate) = 1
+    BEGIN
+        THROW 50003, 'birth date: invalid format', 1;
+    END
+
+    INSERT INTO Czytelnik ([PESEL], [Nazwisko], [Data_Urodzenia])
+    VALUES (@PESEL, @LastName, @BirthDate);
+
+    PRINT 'Reader added';
+END;
+GO
+
+
+EXEC InsertNewReader @PESEL = 12345678912, @LastName = 'Abba', @BirthDate = '2023-13-23';
+GO
+
+
+
+
+
+
+
+
+ZAD4
+
+DROP PROCEDURE IF EXISTS zad4
+DROP TYPE IF EXISTS ReadersID
+GO
+
+CREATE TYPE ReadersID AS TABLE(czytelnik_id INT)
+GO
+
+CREATE PROCEDURE zad4 @readers_id ReadersID READONLY AS
+BEGIN
+	SELECT czytelnicy.czytelnik_id AS reader_id, SUM([dbo].[Wypozyczenie].Liczba_Dni) AS sum_days
+	FROM @readers_id AS czytelnicy, [dbo].[Czytelnik], [dbo].[Wypozyczenie]
+	WHERE czytelnicy.czytelnik_id = [dbo].[Czytelnik].Czytelnik_ID AND [dbo].[Czytelnik].Czytelnik_ID = [dbo].[Wypozyczenie].Czytelnik_ID
+	GROUP BY czytelnicy.czytelnik_id
+END
+GO
+
+
+DECLARE @czytelnicyid ReadersID
+INSERT INTO @czytelnicyid
+SELECT[Czytelnik_ID]
+FROM [dbo].[Czytelnik]
+
+EXEC zad4 @czytelnicyid
+GO
+
+
+
+
+
+
+
+ZAD5
+
+DROP PROCEDURE IF EXISTS UpdateDiscontinuedDate
+DROP TYPE IF EXISTS ListOfProductID
+GO
+
+CREATE TYPE ListOfProductID AS TABLE (ID INT PRIMARY KEY, ProductID INT);
+GO
+
+
+
+CREATE PROCEDURE UpdateDiscontinuedDate @IDs ListOfProductID READONLY, @NewDiscontinuedDate DATE
+AS
+BEGIN
+    DECLARE @iProductID INT;
+    DECLARE @N INT;
+
+    SET @N = (SELECT COUNT(*) FROM @IDs);
+
+    DECLARE @i INT = 1;
+
+    WHILE @i <= @N
+    BEGIN
+        SELECT @iProductID = ProductID
+        FROM @IDs
+        WHERE ID = @i;
+
+        IF NOT EXISTS (SELECT 1 FROM [SalesLT].[Product] WHERE ProductID = @iProductID AND DiscontinuedDate IS NOT NULL)
+        BEGIN
+            UPDATE SalesLT.Product
+            SET DiscontinuedDate = @NewDiscontinuedDate
+            WHERE ProductID = @iProductID;
+        END
+        ELSE
+        BEGIN
+            PRINT 'DiscontinuedDate for ID = ' + CAST(@iProductID AS VARCHAR) + ' not equal to NULL.';
+        END
+
+        SET @i = @i + 1;
+    END
+END;
+GO
+
+
+
+DECLARE @Products ListOfProductID;
+
+INSERT INTO @Products (ID, ProductID)
+VALUES (1, 707), (2, 708);
+
+EXEC UpdateDiscontinuedDate @IDs = @Products, @NewDiscontinuedDate = '2023-10-23';
+
+
+
+
+
+
+
+

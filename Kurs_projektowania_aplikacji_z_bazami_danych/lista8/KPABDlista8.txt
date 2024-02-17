@@ -1,0 +1,53 @@
+ZAD1.
+
+CREATE
+  (charlie:Person {name: 'Charlie Sheen'}),
+  (martin:Person {name: 'Martin Sheen'}),
+  (michael:Person {name: 'Michael Douglas'}),
+  (oliver:Person {name: 'Oliver Stone'}),
+  (rob:Person {name: 'Rob Reiner'}),
+  (wallStreet:Movie {title: 'Wall Street'}),
+  (charlie)-[:ACTED_IN {role: 'Bud Fox'}]->(wallStreet),
+  (martin)-[:ACTED_IN {role: 'Carl Fox'}]->(wallStreet),
+  (michael)-[:ACTED_IN {role: 'Gordon Gekko'}]->(wallStreet),
+  (oliver)-[:DIRECTED]->(wallStreet),
+  (thePresident:Movie {title: 'The American President'}),
+  (martin)-[:ACTED_IN {role: 'A.J. MacInerney'}]->(thePresident),
+  (michael)-[:ACTED_IN {role: 'President Andrew Shepherd'}]->(thePresident),
+  (rob)-[:DIRECTED]->(thePresident),
+  (martin)-[:FATHER_OF]->(charlie)
+
+
+
+
+ZAD2.
+
+
+CREATE (jan:Person {name: 'Jan Kowalski'}),
+       (michal:Person {name: 'Michal Nowak'}),
+       (movie1:Movie {title: 'Movie1'}),
+       (movie2:Movie {title: 'Movie2'});
+
+MATCH (m:Movie {title: 'Movie1'})
+SET m.releaseYear = 2023,
+    m.description = 'Action movie';
+
+
+MATCH (jan:Person {name: 'Jan Kowalski'}),
+      (michal:Person {name: 'Michal Nowak'}),
+      (movie1:Movie {title: 'Movie1'}),
+      (movie2:Movie {title: 'Movie2'})
+CREATE (jan)-[:ACTED_IN {role: 'Role1'}]->(movie1),
+       (michal)-[:ACTED_IN {role: 'Role2'}]->(movie2);
+
+
+
+MATCH (m:Movie {title: 'Movie1'})
+SET m.description = 'An action movie about action or whatever.';
+
+
+MATCH (:Person {name: 'Jan Kowalski'})-[a:ACTED_IN]->(:Movie {title: 'Movie1'})
+DELETE a;
+
+
+

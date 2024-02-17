@@ -1,0 +1,353 @@
+ZAD1
+
+DROP TABLE IF EXISTS Product_Backup
+GO
+
+CREATE TABLE Product_Backup (
+    ProductID INT PRIMARY KEY,
+    Name NVARCHAR(50),
+    ProductNumber NVARCHAR(25),
+    Color NVARCHAR(15),
+    StandardCost MONEY,
+    ListPrice MONEY,
+    Size NVARCHAR(5),
+    Weight DECIMAL(8,2),
+    ProductCategoryID INT,
+    ProductModelID INT,
+    SellStartDate DATETIME,
+    SellEndDate DATETIME,
+    DiscontinuedDate DATETIME,
+    ThumbNailPhoto VARBINARY(MAX),
+    ThumbnailPhotoFileName NVARCHAR(50),
+    rowguid UNIQUEIDENTIFIER,
+    ModifiedDate DATETIME
+);
+GO
+
+
+
+
+
+SET STATISTICS TIME ON;
+INSERT INTO Product_Backup SELECT * FROM SalesLT.Product;
+SET STATISTICS TIME OFF;
+GO
+
+
+
+
+DROP TABLE IF EXISTS Product_Backup
+GO
+
+
+CREATE TABLE Product_Backup (
+    ProductID INT PRIMARY KEY,
+    Name NVARCHAR(50),
+    ProductNumber NVARCHAR(25),
+    Color NVARCHAR(15),
+    StandardCost MONEY,
+    ListPrice MONEY,
+    Size NVARCHAR(5),
+    Weight DECIMAL(8,2),
+    ProductCategoryID INT,
+    ProductModelID INT,
+    SellStartDate DATETIME,
+    SellEndDate DATETIME,
+    DiscontinuedDate DATETIME,
+    ThumbNailPhoto VARBINARY(MAX),
+    ThumbnailPhotoFileName NVARCHAR(50),
+    rowguid UNIQUEIDENTIFIER,
+    ModifiedDate DATETIME
+);
+GO
+
+
+
+
+SET STATISTICS TIME ON;
+DECLARE @ProductID INT, @Name NVARCHAR(50), @ProductNumber NVARCHAR(25), @Color NVARCHAR(15), @StandardCost MONEY, @ListPrice MONEY, @Size NVARCHAR(5), @Weight DECIMAL(8,2), @ProductCategoryID INT, @ProductModelID INT, @SellStartDate DATETIME, @SellEndDate DATETIME, @DiscontinuedDate DATETIME, @ThumbNailPhoto VARBINARY(MAX), @ThumbnailPhotoFileName NVARCHAR(50), @rowguid UNIQUEIDENTIFIER, @ModifiedDate DATETIME;
+
+DECLARE row_cursor CURSOR FOR
+SELECT ProductID, Name, ProductNumber, Color, StandardCost, ListPrice, Size, Weight, ProductCategoryID, ProductModelID, SellStartDate, SellEndDate, DiscontinuedDate, ThumbNailPhoto, ThumbnailPhotoFileName, rowguid, ModifiedDate
+FROM SalesLT.Product;
+
+OPEN row_cursor;
+FETCH NEXT FROM row_cursor INTO @ProductID, @Name, @ProductNumber, @Color, @StandardCost, @ListPrice, @Size, @Weight, @ProductCategoryID, @ProductModelID, @SellStartDate, @SellEndDate, @DiscontinuedDate, @ThumbNailPhoto, @ThumbnailPhotoFileName, @rowguid, @ModifiedDate;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    INSERT INTO Product_Backup (ProductID, Name, ProductNumber, Color, StandardCost, ListPrice, Size, Weight, ProductCategoryID, ProductModelID, SellStartDate, SellEndDate, DiscontinuedDate, ThumbNailPhoto, ThumbnailPhotoFileName, rowguid, ModifiedDate)
+    VALUES (@ProductID, @Name, @ProductNumber, @Color, @StandardCost, @ListPrice, @Size, @Weight, @ProductCategoryID, @ProductModelID, @SellStartDate, @SellEndDate, @DiscontinuedDate, @ThumbNailPhoto, @ThumbnailPhotoFileName, @rowguid, @ModifiedDate);
+
+    FETCH NEXT FROM row_cursor INTO @ProductID, @Name, @ProductNumber, @Color, @StandardCost, @ListPrice, @Size, @Weight, @ProductCategoryID, @ProductModelID, @SellStartDate, @SellEndDate, @DiscontinuedDate, @ThumbNailPhoto, @ThumbnailPhotoFileName, @rowguid, @ModifiedDate;
+END;
+
+CLOSE row_cursor;
+DEALLOCATE row_cursor;
+SET STATISTICS TIME OFF;
+GO
+
+
+
+
+
+
+
+
+ZAD2
+
+03-rodzaje-kursorow.sql
+
+
+
+
+
+
+ZAD3
+
+
+DROP TABLE IF EXISTS Prices
+GO
+
+DROP TABLE IF EXISTS Products
+GO
+
+CREATE TABLE Products(ID INT PRIMARY KEY, ProductName VARCHAR(50))
+GO
+
+INSERT INTO Products VALUES(1, 'product1')
+INSERT INTO Products VALUES(2, 'product2')
+INSERT INTO Products VALUES(3, 'product3')
+GO
+
+DROP TABLE IF EXISTS Rates
+GO
+
+CREATE TABLE Rates(Currency VARCHAR(3) PRIMARY KEY, PricePLN MONEY)
+GO
+
+INSERT INTO Rates VALUES('PLN', 1.00)
+INSERT INTO Rates VALUES('USD', 4.21)
+INSERT INTO Rates VALUES('EUR', 4.44)
+INSERT INTO Rates VALUES('GBP', 5.09)
+INSERT INTO Rates VALUES('CZK', 0.18)
+GO
+
+
+
+CREATE TABLE Prices(ProductID INT REFERENCES Products(ID), Currency VARCHAR(3) REFERENCES Rates(Currency), Price MONEY)
+GO
+
+
+INSERT INTO Prices VALUES(1, 'PLN', 1.0)
+INSERT INTO Prices VALUES(2, 'PLN', 2.50)
+INSERT INTO Prices VALUES(3, 'PLN', 5.0)
+INSERT INTO Prices VALUES(1, 'USD', 5.20)
+INSERT INTO Prices VALUES(2, 'EUR', 100.99)
+INSERT INTO Prices VALUES(2, 'GBP', 49.14)
+INSERT INTO Prices VALUES(3, 'CZK', 21.99)
+GO 
+
+SELECT * FROM Prices
+GO
+
+ALTER TABLE Prices NOCHECK CONSTRAINT ALL
+DELETE from Rates WHERE Currency = 'EUR'
+ALTER TABLE Prices CHECK CONSTRAINT ALL
+GO
+
+
+DECLARE @ProductID INT, @Currency VARCHAR(3), @Price MONEY, @UpdatedPrice MONEY
+
+
+DECLARE price_cursor CURSOR FOR
+SELECT Prices.ProductID, Prices.Currency, Prices.Price
+FROM Prices
+
+
+OPEN price_cursor;
+
+
+FETCH NEXT FROM price_cursor INTO @ProductID, @Currency, @Price;
+
+
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @UpdatedPrice = (SELECT Price FROM Prices WHERE ProductID = @ProductID AND Currency = 'PLN') * (SELECT PricePLN FROM Rates WHERE Currency = @Currency);
+    
+    UPDATE Prices SET Price = @UpdatedPrice WHERE ProductID = @ProductID AND Currency = @Currency
+
+    FETCH NEXT FROM price_cursor INTO @ProductID, @Currency, @Price;
+END;
+
+CLOSE price_cursor;
+DEALLOCATE price_cursor;
+GO
+
+
+DELETE FROM Prices WHERE Currency NOT IN (SELECT Currency FROM Rates);
+GO
+
+SELECT * FROM Prices
+GO
+
+
+
+
+
+
+
+
+
+
+ZAD4
+
+
+DROP TABLE IF EXISTS Employees
+GO
+
+
+CREATE TABLE Employees (
+    ID INT PRIMARY KEY,
+    SalaryGros MONEY
+);
+GO
+
+
+DROP TABLE IF EXISTS SalaryHistory
+GO
+
+
+
+CREATE TABLE SalaryHistory (
+    EmployeeID INT,
+    Month INT,
+    SalaryNet MONEY,
+    SalaryGros MONEY,
+    Tax MONEY
+);
+GO
+
+
+
+DROP TABLE IF EXISTS Logging
+GO
+
+
+CREATE TABLE Logging (
+    EmployeeID INT,
+    Month INT,
+    Info VARCHAR(50)
+);
+GO
+
+
+
+
+DROP PROCEDURE IF EXISTS CalculateSalaryForMonth
+GO
+
+
+
+
+CREATE PROCEDURE CalculateSalaryForMonth
+    @Month INT
+AS
+BEGIN
+    DECLARE @EmployeeID INT, @Salary MONEY, @WithPrevious MONEY, @Tax MONEY
+    
+    DECLARE employee CURSOR FOR
+    SELECT ID, SalaryGros FROM Employees;
+
+    OPEN employee;
+
+    FETCH NEXT FROM employee INTO @EmployeeID, @Salary;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @WithPrevious = 0
+        SET @TAX = 0
+        
+        DECLARE @i INT = 1;
+        DECLARE @Fail INT;
+        SET @Fail = 0;
+
+        IF EXISTS (SELECT * FROM SalaryHistory WHERE EmployeeID = @EmployeeID AND Month <= @Month)
+        BEGIN
+        WHILE @i < @Month
+        BEGIN
+            IF EXISTS (SELECT * FROM SalaryHistory WHERE EmployeeID = @EmployeeID AND Month = @i)
+            BEGIN
+                SET @WithPrevious = @WithPrevious + (SELECT SalaryNet FROM SalaryHistory WHERE EmployeeID = @EmployeeID AND Month = @i);
+            END
+            ELSE
+            BEGIN
+                INSERT INTO Logging VALUES(@EmployeeID, @Month, 'missing salary in one of the previous months');
+                SET @Fail = 1;
+                SET @i = @Month + 1;
+            END
+            SET @i = @i + 1;
+        END;
+        IF @Fail = 0
+        BEGIN
+             SET @WithPrevious = @WithPrevious + @Salary;
+        END
+        END;
+        ELSE
+        BEGIN
+             SET @WithPrevious = @Salary;
+        END
+
+
+
+        
+
+        IF 12 * @Salary > 120000 AND @Fail = 0 AND @WithPrevious > 120000
+        BEGIN
+            SET @Tax = 15300 + 0.32 * (@WithPrevious - 120000);
+            INSERT INTO SalaryHistory (EmployeeID, Month, SalaryNet, SalaryGros, Tax)
+            VALUES (@EmployeeID, @Month, @Salary - @Tax, @Salary, @Tax);
+        END
+        ELSE IF @Fail = 0
+        BEGIN
+            SET @Tax = 0.17 * @WithPrevious;
+            INSERT INTO SalaryHistory (EmployeeID, Month, SalaryNet, SalaryGros, Tax)
+            VALUES (@EmployeeID, @Month, @Salary - @Tax, @Salary, @Tax);
+        END
+
+        FETCH NEXT FROM employee INTO @EmployeeID, @Salary;
+    END;
+
+    CLOSE employee;
+    DEALLOCATE employee;
+END;
+GO
+
+
+
+INSERT INTO Employees VALUES(1, 1000)
+INSERT INTO Employees VALUES(2, 100000)
+
+GO
+
+EXEC CalculateSalaryForMonth @MONTH = 1;
+GO
+
+
+EXEC CalculateSalaryForMonth @MONTH = 2;
+GO
+
+INSERT INTO Employees VALUES(3, 1000)
+
+EXEC CalculateSalaryForMonth @MONTH = 4;
+GO
+
+
+
+
+SELECT * FROM SalaryHistory;
+GO
+
+SELECT * FROM Logging;
+GO

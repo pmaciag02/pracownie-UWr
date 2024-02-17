@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body>
+    <table>
+        <tr>
+            <td colspan="4"><input type="text" id="result" class='result'></td>
+        </tr>
+        <tr>
+            <td><button class= "button">DEL</button></td>
+            <td><button class= "button">(</button></td>
+            <td><button class= "button">)</button></td>
+            <td><button class= "button">CE</button></td>
+        </tr>
+        <tr>
+            <td><button class= "button" id="number">1</button></td>
+            <td><button class= "button" id="number">2</button></td>
+            <td><button class= "button" id="number">3</button></td>
+            <td><button class= "button dark" id="operand">/</button></td>
+        </tr>
+        <tr>
+            <td><button class= "button" id="number">4</button></td>
+            <td><button class= "button" id="number">5</button></td>
+            <td><button class= "button" id="number">6</button></td>
+            <td><button class= "button dark" id="operand">*</button></td>
+        </tr>
+        <tr>
+            <td><button class= "button" id="number">7</button></td>
+            <td><button class= "button" id="number">8</button></td>
+            <td><button class= "button" id="number">9</button></td>
+            <td><button class= "button dark" id="operand">-</button></td>
+        </tr>
+        <tr>
+            <td><button class= "button" id="number">0</button></td>
+            <td><button class= "button dark" id="operand">.</button></td>
+            <td><button class= "button-equal dark" id="equal">=</button></td>
+            <td><button class= "button dark" id="operand">+</button></td>
+        </tr>
+    </table>
+</body>
+</html>

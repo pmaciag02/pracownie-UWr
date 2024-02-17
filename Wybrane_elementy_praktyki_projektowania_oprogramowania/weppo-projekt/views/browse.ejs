@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produkty - Nazwa Sklepu</title>
+    <link rel="stylesheet" href="/style.css">
+    <%- include('product-description', locals) %>
+</head>
+<body>
+
+<header>
+    <%- include('header', locals) %>
+</header>
+
+<main>
+    <form method="POST">
+        <div id='data'>
+            <h3>
+                Wyszukaj produkt
+            </h3>
+            <div>
+                <label>Nazwa/opis produktu:</label>
+                <input type='text' value='<%= data %>' name='data' />
+            </div>
+            <div>
+                <button>Szukaj</button>
+            </div>
+        </div>
+    </form>
+    <section class="product-list">
+        <h2>Wyniki wyszukiwania:</h2>
+        <% if (anyresult) { %>
+        <% if (result.rows.length > 0) { %>
+            <%- include('product-list', locals) %>
+        <% } else { %>
+            <div class='message'>
+                <strong>Brak produktów o podanej nazwie lub opisie!</strong>
+            </div>
+        <% } %>
+        <% } %>
+
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Nazwa Sklepu. Wszelkie prawa zastrzeżone.</p>
+</footer>
+
+</body>
+</html>

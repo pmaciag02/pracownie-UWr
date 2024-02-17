@@ -1,0 +1,224 @@
+ZAD1.
+mongosh
+
+show dbs
+
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
+using System;
+
+/*
+
+> db.authors.save({_id:1, name:"Golden"});
+> db.authors.save({_id:2, name:"Golding"});
+> db.authors.save({_id:3, name:"Bułhakow"});
+
+ */
+
+namespace MongoDBClient
+{
+    public class Author
+    {
+        [BsonElement("_id")]
+        public object Id { get; set; }
+
+        [BsonElement("name")]
+        public string Name { get; set; }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var client = new MongoClient();
+            var library = client.GetDatabase("library");
+            var authors = library.GetCollection<Author>("authors");
+            var items = from b in authors.AsQueryable()
+                        select b;
+
+            foreach (var e in items)
+            {
+                Console.WriteLine(e.Name);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+ZAD2.
+
+db.Ksiazki.insertOne({_id: 1, ISBN: "83-246-0279-8", Tytul: "Microsoft Access. Podr cznik administratora", Autor: "Helen Feddema", Rok_Wydania: 2006, Cena: 69, Egzemplarze: [{_id: 1, Sygnatura: "S0001", Wyporzyczenia: [{_id: 1, Data: ISODate("2020-02-01"), Liczba_Dni: 12, Czytelnik: {_id: 1, PESEL: 55101011111, Nazwisko: "Kowalski", Miasto: "Wroclaw", Data_Urodzenia: ISODate("1955-10-10")}}, {_id: 2, Data: ISODate("2020-02-20"), Liczba_Dni: 20, Czytelnik: {_id: 2, PESEL: 60101033333, Nazwisko: "Maliniak", Miasto: "Wroclaw", Data_Urodzenia: ISODate("1960-10-10")}}]}]})
+
+
+
+db.Ksiazki.insertOne({_id: 2, ISBN: "83-246-0653-X", Tytul: "SQL Server 2005. Programowanie. Od podstaw", Autor: "Robert Vieira", Rok_Wydania: 2007, Cena: 97, Egzemplarze: [{_id: 2, Sygnatura: "S0002", Wyporzyczenia: [{_id: 3, Data: ISODate("2020-01-21"), Liczba_Dni: 45, Czytelnik: {_id: 1, PESEL: 55101011111, Nazwisko: "Kowalski", Miasto: "Wroclaw", Data_Urodzenia: ISODate("1955-10-10")}}]}, {_id: 3, Sygnatura: "S0003", Wyporzyczenia: [{_id: 4, Data: ISODate("2020-01-13"), Liczba_Dni: 7, Czytelnik: {_id: 2, PESEL: 60101033333, Nazwisko: "Maliniak", Miasto: "Wroclaw", Data_Urodzenia: ISODate("1960-10-10")}}]}]})
+
+
+ZAD3.
+
+db.runCommand({
+  collMod: "Ksiazki",
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "ISBN", "Tytul", "Autor", "Rok_Wydania", "Cena", "Egzemplarze"],
+      properties: {
+        _id: {
+          bsonType: "int",
+          description: "must be an integer and is required"
+        },
+        ISBN: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        Tytul: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        Autor: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        Rok_Wydania: {
+          bsonType: "int",
+          description: "must be an integer and is required"
+        },
+        Cena: {
+          bsonType: "int",
+          description: "must be a double and is required"
+        },
+        Egzemplarze: {
+          bsonType: "array",
+          description: "must be an array and is required",
+          items: {
+            bsonType: "object",
+            required: ["_id", "Sygnatura", "Wyporzyczenia"],
+            properties: {
+              _id: {
+                bsonType: "int",
+                description: "must be an integer and is required"
+              },
+              Sygnatura: {
+                bsonType: "string",
+                description: "must be a string and is required"
+              },
+              Wyporzyczenia: {
+                bsonType: "array",
+                description: "must be an array and is required",
+                items: {
+                  bsonType: "object",
+                  required: ["_id", "Data", "Liczba_Dni", "Czytelnik"],
+                  properties: {
+                    _id: {
+                      bsonType: "int",
+                      description: "must be an integer and is required"
+                    },
+                    Data: {
+                      bsonType: "date",
+                      description: "must be a date and is required"
+                    },
+                    Liczba_Dni: {
+                      bsonType: "int",
+                      description: "must be an integer and is required"
+                    },
+                    Czytelnik: {
+                      bsonType: "object",
+                      required: ["_id", "PESEL", "Nazwisko", "Miasto", "Data_Urodzenia"],
+                      properties: {
+                        _id: {
+                          bsonType: "int",
+                          description: "must be an integer and is required"
+                        },
+                        PESEL: {
+                          bsonType: "double",
+                          description: "must be an integer and is required"
+                        },
+                        Nazwisko: {
+                          bsonType: "string",
+                          description: "must be a string and is required"
+                        },
+                        Miasto: {
+                          bsonType: "string",
+                          description: "must be a string and is required"
+                        },
+                        Data_Urodzenia: {
+                          bsonType: "date",
+                          description: "must be a date and is required"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+})
+
+
+
+
+
+
+ZAD4.
+
+var c = db.Ksiazki.count()
+db.Ksiazki.find({},{_id:1}).sort({_id:1}).skip((c/2)-1).limit(2)
+
+
+db.Ksiazki.find({'Egzemplarze.Sygnatura': "S0001"})
+
+
+
+
+
+ZAD5.
+
+start "A" mongod --dbpath c:\Data\Databases\MongoDB\db1 --port 10000 --replSet "demo"
+start "B" mongod --dbpath c:\Data\Databases\MongoDB\db2 --port 20000 --replSet "demo"
+start "C" mongod --dbpath c:\Data\Databases\MongoDB\db3 --port 30000 --replSet "demo"
+
+mongosh --port 10000
+
+
+var rsConfig={ _id: "demo", members: [{_id: 0, host:
+'localhost:10000', priority: 10}, {_id: 1, host:
+'localhost:20000'}, {_id: 2, host: 'localhost:30000',
+arbiterOnly: true}]}
+
+
+rsConfig
+
+
+rs.initiate(rsConfig)
+
+use test
+
+db.books.insertOne({_id:1, title:"Mistrz i Małgorzata"})
+
+db.books.find()
+
+mongosh --port=20000
+
+db.books.insertOne({_id:2, title:"Wyznania gejszy"})
+
+db.books.find()
+
+rs.secondaryOk()
+
+db.books.find()
+
+// Kill PRIMARY
+// Check SECONDARY
+
+start "A" mongod --dbpath c:\Data\Databases\MongoDB\db1 --port 10000 --replSet "demo"
+
+// Check again

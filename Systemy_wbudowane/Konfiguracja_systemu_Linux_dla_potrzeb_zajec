@@ -1,0 +1,17 @@
+Instrukcja jest napisana dla systemów Debian i podobnych (np. Ubuntu). Do innych systemów należy ją dopasować we własnym zakresie.
+
+Należy zainstalować niezbędny zestaw narzędzi z repozytorium:
+
+apt-get install gcc-avr avr-libc avrdude screen make python3-serial
+
+Aby móc korzystać z portu szeregowego /dev/ttyUSB0 bez użycia sudo można wykonać jedną z dwóch rzeczy. Albo dodać użytkownika do grupy dialout (aby zmiana zadziałała, konieczne jest ponowne zalogowanie się w systemie):
+
+sudo usermod -a -G dialout $USER
+
+Można też dodać regułę udev, która zmieni uprawnienia dostępu do portu. W tym celu należy utworzyć plik, np. /etc/udev/rules.d/99-ch340.rules o następującej treści:
+
+ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666"
+
+Zamiast programu screen można używać programu miniterm (lub miniterm.py) dostępnego w pakiecie python3-serial.
+
+W sytuacji, gdyby urządzenie /dev/ttyUSB0 nie pojawiało się, a dmesg wskazywał na to, że urządzenie znika szybko po podłączeniu, rozwiązaniem może być usunięcie pakietu brltty.

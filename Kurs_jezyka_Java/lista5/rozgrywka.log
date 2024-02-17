@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2023-11-29T11:48:05.085607486Z</date>
+  <millis>1701258485085</millis>
+  <nanos>607486</nanos>
+  <sequence>0</sequence>
+  <logger>Gra</logger>
+  <level>INFO</level>
+  <class>Gra</class>
+  <method>start</method>
+  <thread>19</thread>
+  <message>Rozpoczęcie nowej gry. Zakres: 7. Wylosowana liczba: 3/5. Maks. liczba prób: 6</message>
+</record>
+<record>
+  <date>2023-11-29T11:48:08.686747431Z</date>
+  <millis>1701258488686</millis>
+  <nanos>747431</nanos>
+  <sequence>1</sequence>
+  <logger>Gra</logger>
+  <level>INFO</level>
+  <class>Gra</class>
+  <method>End</method>
+  <thread>19</thread>
+  <message>Zakończenie gry. Porażka.</message>
+</record>
+</log>

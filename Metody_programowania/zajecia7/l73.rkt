@@ -1,0 +1,95 @@
+#lang racket
+
+
+;Task 3
+;(define/contract (suffixes xs)
+ ; (parametric->/c [a] (-> (listof a) (listof (listof a))))
+  ;(cond [(null? xs) (list null)]
+   ;     [else (append (list xs) (suffixes (cdr xs)))]))
+
+(define/contract (suffixes xs)
+  (parametric->/c [a] (-> (listof a) (listof (listof a))))
+  (match xs
+    ['() (list null)]
+    [(cons x xs) (cons (cons x xs) (suffixes xs))]))
+
+
+(define a (suffixes (list 1 2 3 4)))
+
+
+
+
+;Task 4
+(define/contract (sublists xs)
+  (parametric->/c [a] (-> (listof a) (listof (listof a))))
+  (if (null? xs)
+      (list null)
+      (append-map
+       (lambda (ys) (list (cons (car xs) ys) ys)) ; list zamiast cons
+       (sublists (cdr xs)))))
+
+
+(sublists '(1 2 3))
+(sublists '(1 2))
+
+
+
+
+
+
+;Task 5
+(define/contract (xd1 a b)
+  (parametric->/c [a b] (-> a b a))
+  a)
+
+(define/contract (xd2 f g x)
+  (parametric->/c [a b c] (-> (-> a b c) (-> a b) a c))
+  (f x (g x)))
+
+(define/contract (xd3 f g)
+  (parametric->/c [a b c] (-> (-> b c) (-> a b) (-> a c)))
+  (lambda (x) (f (g x))))
+
+(define/contract (xd4 f)
+  (parametric->/c [a] (-> (-> (-> a a) a) a))
+  (f (lambda (x) x)))
+
+
+
+
+
+
+
+
+
+
+;Task 6
+
+
+(define/contract (foldl-map f a xs)
+  (parametric->/c [x y z] (-> (-> x y (cons/c z y))
+                              y
+                              (listof x)
+                              (cons/c (listof z) y)))
+
+  ;(parametric->/c [a b c] (-> (-> a b (cons/c c b)) b (listof a) (cons/c (listof c) b)))
+
+
+
+  
+  (define (it a xs ys)
+    (if (null? xs)
+        (cons (reverse ys) a)
+        (let [(p (f (car xs) a)) ]
+          (it (cdr p)
+              (cdr xs)
+              (cons (car p) ys)))))
+  (it a xs null))
+
+
+
+
+
+;(define/contract (xd f a b)
+ ; (parametric->/c [x y z] (-> (-> (cons/c x y) (cons/c z y)) x y (cons/c z y)))
+  ;(cons (car (f (cons a b))) b))

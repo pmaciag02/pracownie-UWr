@@ -1,0 +1,56 @@
+Szyfr podstawieniowy z łączeniem bloków CBC
+Opis:
+
+W szyfrze podstawieniowym zamieniamy każdy znak na inny zdefiniowany przez permutacje Perm(), którą zadajemy przez klucz będący napisem z poprzestawianymi znakami. W naszym zadaniu będziemy szyfrować dopuszczalne znaki o kodach ASCII domyślnie z zakresu 32-96 czyli bez otwierających i zamykających cudzysłowiów klucz opisujący identycznościową permutację to:  
+
+" !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
+
+W uproszczeniu gdybyśmy mieli zamiast 64 tylko 5 dopuszczalnych znaków "ABCDE", to permutację mógłby definiować klucz w postaci napisu "CBDEA". Łączenie bloków CBC polega na tym, że dla każdego następnego bloku (u nas znaku) permutację stosujemy do znaku przesuniętego modulo o pozycję poprzedniego zakodowanego znaku, a dla pierwszego znaku o wartość inicjalizującą.
+
+Czyli w przykładzie z 5 znakami gdybyśmy szyfrowali bez wiązania bloków ciąg znaków "ABCDE" to otrzymamy "CBDEA", a w naszym przypadku z wiązaniem bloków CBC i wartością inicializacyjną  0 (odpowiadającą pierwszej literze A) zaszyfrowany tekst to "CEBAA".
+
+Jeśli ciąg wejściowy to A_i to dla permutacji Perm() ciąg zaszyfrowanych kolejnych znaków poza pierwszym to:
+              C_i = Perm(        Shift(        A_i,      C_(i-1) )   )  
+Aby odszyfrować potrzebujemy odwrotnych permutacji  InvPerm() i przesunięcia InvShift() i mamy ciąg orginalny:
+              A_i = InvShift (  InvPerm( C_i ),   C_(i-1)     )
+
+Funkcja Shift(z1, z2) przesuwa (modulo ilość dopuszczalnych znaków) znak z1 o pozycje znaku z2 czyli w przykładzie ze znakami ABCDE dla znaku A o 0, dla znaku B o 1 modulo 5, itd...  Wtedy funkcja InvShift(z1,z2) przesuwa dla znaku B o -1 modulo 5, dla C o -2 modulo 5, itd. Permutację odwrotną jako ciąg znaków można policzyć z klucza definiującego permutację Perm().
+
+Specyfikacja:
+
+Na wejściu mamy ciąg wierszy składających się z trzy znakowego polecenia i spacji po którym następuje ciąg maksymalnie 128 znaków. Dopuszczalne polecenia to
+
+CFG podajemy dwie liczby S (kod pierwszego dopuszczalnego znaku) i M (ilość znaków) (czyli domyślnie: S=32 M=64)
+KEY podanie klucza w postaci M (domyślnie M=64) znaków
+INI podanie wartości inicjalizującej CBC w postaci liczby
+ENC zaszyfrowanie podanego w wierszu tekstu i wypisanie w wierszu na standardowym wyjściu
+DEC odszyfrowanie podanego w wierszu tekstu i wypisanie w wierszu na standardowym wyjściu
+Jeśli w podanym ciągu znaków jest znak spoza zakresu lub nie został wcześniej podany klucz to kończymy działanie programu, przykłady testowe będą poprawne, dopuszczalne znaki nie zawierają znaków kontrolnych, czyli max. zakres to konfiguracja "CFG 32 95".
+
+Przykład danych 1:
+
+KEY  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+INI 0
+ENC BUDZETY SUBWENCYJNE UCZELNI IDUB W LATACH 2021-2022 WZROSNA LACZNIE O 3%,
+ENC INNYCH UCZELNI AKADEMICKICH O 7%. 
+DEC B7[U:.''ZO1(M;^WA/TTI,&K7%NN7[P22))U6*K.VV(8J[(:J\..%_Q@3!BB.O2,ZC((WW*/;
+Wynik 1:
+
+B7[U:.''ZO1(M;^WA/TTI,&K7%NN7[P22))U6*K.VV(8J[(:J\..%_Q@3!BB.O2,ZC((WW*/;
+I7%^A))^A; L:##D/P4YF/R=&I11  7<JJ
+BUDZETY SUBWENCYJNE UCZELNI IDUB W LATACH 2021-2022 WZROSNA LACZNIE O 3%,
+
+Przykład danych 2:
+
+CFG 65 5
+INI 0
+KEY CBDEA
+ENC ABCDE
+DEC CEBAA
+INI 3
+ENC ABCDE
+Wynik 2:
+
+CEBAA
+ABCDE
+ECAEE

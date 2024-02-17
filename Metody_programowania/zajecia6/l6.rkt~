@@ -1,0 +1,5 @@
+#lang racket
+
+; L = (map f (map g (cons x xs))) = (map f (cons (g x) (map g xs))) = (cons (f (g x)) (map f (map g xs)))
+
+; R = (map (lambda (x) (f (g x))) (cons x xs)) = (cons (lambda ((x) (f (g x))) x) (map (lambda (x) (f (g x))) xs)) = (cons (f (g x)) (map (lambda (x) (f (g x))) xs))

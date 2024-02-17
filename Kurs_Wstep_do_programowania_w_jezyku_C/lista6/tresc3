@@ -1,0 +1,115 @@
+Deterministyczny automat skończony
+Deterministyczny automat skończony jest abstrakcyjną maszyną posiadającą stan i zestaw zasad mówiący o tym jak stan się zmienia podczas czytania liter. Stan maszyny jest określony liczną naturalną z zakresu od 0 do N-1, gdzie N jest rozmiarem danej maszyny. Maszyna rozpoczyna swą pracę w pewnym stanie początkowym I, a następnie czyta iteracyjnie kolejne litery słowa i zmienia swój stan zgodnie z definiującymi ją zasadami. Część stanów maszyny jest wyróżniona jako akceptująca. Jeśli po przeczytaniu całego słowa maszyna jest w stanie akceptującym akceptuje ona przeczytane słowo, w przeciwnym przypadku odrzuca je.
+
+Zadanie polega na napisaniu programu symulującego Deterministyczny automat skończony zgodnie z opisaną poniżej specyfikacją.
+
+Przykład:
+Możemy rozważyć maszynę która ma 10 stanów, wśród których stanem początkowym jest stan 2, a stanami akceptującymi są stany o numerach będących liczbami pierwszymi. Niech maszyna ta czyta słowa składające się z liter a,b,c (alfabet który maszyna przyjmuje składa się również na jej definicję). Niech po każdym przeczytaniu litery a, maszyna bez względu na stan ląduje w stanie 0. Po każdym przeczytaniu litery b niech maszyna będąca w stanie x przejdzie do stanu 2*x modulo 10, a po każdym przeczytaniu litery c maszyna będzie w stanie x+1 modulo 10.
+
+Wtedy maszyna będzie akceptowała np słowo 'abccbbbc', gdyż po jego przeczytaniu znajdzie się w stanie 3
+Napotykając kolejne litery w następujący sposób będzie zmieniała stan:
+2 -a-> 0
+0  -b-> 0
+0  -c-> 1
+1  -c-> 2
+2  -b-> 4
+4  -b-> 8
+8  -b-> 6
+6  -c-> 7
+
+Specyfikacja
+
+W pierwszej linii są trzy liczby oddzielone spacją N, M i A;
+N określa ilość stanów automatu, a M stanów akceptujących a A akceptowanych liter.
+W drugiej linii jest M (posortowanych) numerów stanów akceptujących oddzielonych spacją.
+
+
+W każdej z kolejnych A linii znajduje się N liczb oddzielonych spacją.
+Liczby te określają do którego stanu przejdzie automat będący w  n-stanie przy napotkaniu a-itery (0-litera to 'a', 1-litera to 'b',..., 26-litera to 'z' ) są zatem ograniczone przez N.
+W następnej linii jest jedna liczba T określająca ilość testów, a w kolejnych T liniach:
+jedna liczba I oraz po spacji słowo W. 
+Liczba I określa stan początkowy, a słowo W słowo do przeczytania.
+
+M<N<10000
+A<=26
+T<100
+|W| < 1000
+
+Program powinien zwrócić T linii po jednej dla każdego przypadku testowego, w każdej z nich
+numer stanu w którym skończył automat oraz po spacji słowo "ACCEPT" lub "REJECT" w zależności czy  słowo  zostało zaakceptowane czy nie.
+
+Linie są rozdzielone znakiem '\n' i takiego znaku końca lini oczekuje sprawdzaczka.
+
+Przykład danych 1:
+Zgodne z podanym wcześniej przykładem:
+10 4 3     
+2 3 5 7 
+0 0 0 0 0 0 0 0 0 0
+0 2 4 6 8 0 2 4 6 8
+1 2 3 4 5 6 7 8 9 0   
+2
+2 abccbbbc
+7 abbbbacca
+
+Wynik 1:
+7 ACCEPT
+0 REJECT
+
+Przykład danych 2:
+Akceptuje jeśli różnica wystąpień liter a i b jest podzielna przez 3 (przy starcie z 0) 
+3 1 2
+0
+1 2 0
+2 0 1
+3
+0 abba
+0 aababb
+0 abb
+
+Wynik 2:
+0 ACCEPT
+0 ACCEPT
+2 REJECT
+
+Przykład danych 3:
+Dla początkowego stanu 1 akceptuje język składający się z naprzemienych wystąþień 'slo' i 'ma', np słowa 'sloma', 'maslomaslo'.
+
+7 2 19
+3 6
+0 0 3 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 5 0 0
+0 2 0 0 0 0 2
+0 0 0 0 0 0 0
+0 0 0 0 0 6 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+0 4 0 4 0 0 0
+5
+1 maslo
+1 sloma
+1 masloma
+1 sloslo
+1 basol
+
+Wynik 3:
+
+6 ACCEPT
+3 ACCEPT
+3 ACCEPT
+0 REJECT
+0 REJECT
+
+
+
+Uwaga! W wyniku pomyłki w poniedziałek przez pewien czas zadanie było widoczne jako zadanie z zeszłego tygodnia, jeśli ktoś zaczął już je robić, uległo ono drobnym zmianom np. format wprowadzania przejść automatu. Proszę zwrócić na to uwagę.

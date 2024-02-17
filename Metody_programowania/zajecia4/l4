@@ -1,0 +1,215 @@
+#lang racket
+
+
+
+(require rackunit)
+
+(define-struct leaf () #:transparent)
+(define-struct node (l elem r) #:transparent)
+
+
+
+
+
+
+
+(define (tree? x)
+  (cond [(leaf? x) #t]
+        [(node? x) (and (tree? (node-l x)) (tree? (node-r x)))]
+        [else #f]))
+
+
+
+
+
+
+(define example-tree (node (node (leaf) 1 (leaf))
+                           2
+                           (node (node (leaf) 3 (leaf))
+                                 4
+                                 (node (leaf) 5 (leaf)))))
+
+
+
+
+;zad.1.
+;notatka
+
+;zad.2.
+
+(define (fold-tree f x xs)
+  (if (leaf? xs)
+      x
+      (f (node-elem xs) (f (fold-tree f x (node-l xs)) (fold-tree f x (node-r xs))))))
+
+;(define a (fold-tree * 1 example-tree))
+
+(define (tree-sum t)
+  (fold-tree + 0 t))
+
+
+
+(define (tree-flip t)
+  (define (foo x y)
+    (cond[(node? x)
+          (if (leaf? y)
+              x
+              (node y 0 x))]
+    [else
+          (if (leaf? y)
+              (node (leaf) x (leaf))
+              (node (node-r y) x (node-l y)))]))
+          
+  (fold-tree foo (leaf) t))
+
+(define (tree-flip2 x)
+  (define (foo t t2)
+  (if (leaf? t)
+      t2
+      (if (leaf? t2)
+          (node (leaf) (node-elem t) (leaf))
+      (node (node-r t2) (node-elem t) (node-l t2)))))
+    (fold-tree foo (leaf) x))
+
+;(define a (tree-flip2 example-tree))
+
+(define (mirror t)
+  (if (leaf? t)
+      (leaf)
+      (node (mirror (node-r t)) (node-elem t) (mirror (node-l t)))))
+
+;(define (fold-tree2 f x xs)
+ ; (if (leaf? xs)
+  ;    x
+   ;   (node (f (node-r xs) (node-elem xs) (f (node-l xs))))))
+
+;(define a1 (fold-tree2 * 1 example-tree))
+
+;(define a2 (mirror example-tree))
+
+
+(define (tree-height t)
+  (define (foo x y)
+    1)
+  (fold-tree foo 0 t))
+
+(define a1 (tree-height example-tree))
+
+;zad.3.
+
+(define (bst t)
+  (define (foo x2 x1 a)
+    (cond[(leaf? x2)
+          #t]
+         [(and (= a 0) (> (node-elem x2) (node-elem x1)))
+          #f]
+         [(and (= a 1) (< (node-elem x2) (node-elem x1)))
+          #f]
+         [else (and (foo (node-l x2) x2 0) (foo (node-r x2) x2 1))]))
+  (foo t t 0))
+
+
+(define A (bst example-tree))
+
+
+(define (sum-paths t)
+  (define (foo x y z)
+    (if (leaf? x)
+        y
+        (node (foo (node-l x) y (+ z 1)) z (foo (node-r x) y (+ z 1)))))
+  (foo t (leaf) 0))
+(define B (sum-paths example-tree));
+
+
+;zad.4.
+
+(define (flatten t)
+  (define (flat-append t xs)
+    (if (leaf? t)
+        xs
+        (flat-append (node-l t) (cons (node-elem t) (flat-append (node-r t) xs)))))
+  (flat-append t null))
+
+;(define a (flatten (mirror example-tree)))
+
+
+;zad.5.
+
+
+
+(define (insert-bst x t)
+  (cond [(leaf? t) (node (leaf) x (leaf))]
+        [(node? t)
+         (cond [(> x (node-elem t))
+                (node
+                 (node-l t)
+                 (node-elem t)
+                 (insert-bst x (node-r t)))]
+               [else
+                (node
+                 (insert-bst x (node-l t))
+                 (node-elem t)
+                 (node-r t))])]))
+
+
+;(define a (insert-bst 2 example-tree))             
+
+
+(define (insert x t)
+  (cond
+    [(leaf? t)            (node x leaf leaf)]
+    [(= (node-elem t) x)  t]
+    [(> (node-elem t) x)  (node (node-elem t)
+                                (insert x (node-l t))
+                                (node-r t))]
+    [(< (node-elem t) x)  (node (node-elem t)
+                                (node-l t)
+                                (insert x (node-r t)))]))
+
+(define (tree-sort l)
+  (define (foo xs t)
+    (if (null? xs)
+        t
+        (insert-bst (car xs) (foo (cdr xs) t))))
+  (flatten (foo l (leaf))))
+
+
+(define a (tree-sort (list 3 4 1 5 2))) 
+
+;zad.6.
+
+
+
+
+;zad.7.
+
+
+( define empty-queue ; pusta kolejka
+(cons (list) (list) ))
+
+( define ( empty? q ) ; czy kolejka jest pusta ?
+( eq? (cdr q) (list) ) ) ;null?
+
+( define ( push-back x q ) ; dodaj element na koniec kolejki
+   (if (eq? (car q) (list))
+       ( cons (reverse (cons x (cdr q))) (list))
+( cons (car q) (cons x (cdr q)))));append?
+
+( define ( front q ) ; podejrzyj element na poczatku kolejki
+( caar q ) )
+
+( define ( pop q ) ; zdejmij element z przodu kolejki
+   (if (null? (cdar q))
+       ( cons (reverse (cdr q)) (list))
+( cons (cdar q) (cdr q ) ))) ;empty?
+
+
+(define X (push-back 2 (push-back 1 empty-queue)))
+(define Y (pop X));
+(define Z (push-back 4 (push-back 3 Y)))
+
+;zad.8.
+
+;zad.9.
+
+

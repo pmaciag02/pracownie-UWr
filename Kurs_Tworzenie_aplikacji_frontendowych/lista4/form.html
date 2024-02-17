@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        html {
+            font-size: 3vw;
+        }
+
+        /* 
+        body {
+            font-size: clamp(10px, 2vw, 32px);
+        }
+        */
+
+
+      input:invalid {
+        border-color: red;
+      }
+
+      .content {
+        justify-content: center;
+        margin: 5vw 10vw 5vw 10vw;  
+        
+      }
+
+      .containerf {
+        border: 10px solid aqua;
+        display: flex;
+        flex-direction:column;
+        margin: 20px 20px 20px 20px;  
+        
+        
+      }
+   
+
+
+
+    h1 {
+        font-size: 5vw;
+    }
+
+      .container {
+        margin: 5px;
+        /* font-size: 10vw; */
+        justify-content: center;
+        padding: 2rem;
+          display: flex;
+          flex-direction:column;
+          gap: 1vw;
+    
+        /* font-size: 2vw */
+      }
+
+      .napis {
+    font-size: 5vw;
+  }
+
+  #lmao {
+    font-size: 5vw;
+  }
+
+      @media (min-width: 1000px) {
+        .container {
+          display: grid;
+          grid-template-columns: repeat(1, 1fr);
+          grid-template-areas:
+          "second third"
+          "eleventh twelfth"
+          "fourth fifth"
+          "thirteenth fourteenth"
+          "fifteenth eighth"
+          "sixth sixth"
+          "ninth ninth"
+          "seventh seventh"
+          "tenth tenth";
+        }
+
+        .containerf {
+            max-width: 80vw;
+            justify-self: center;
+            /* margin: 5vw 10vw 5vw 10vw;  */
+        }
+
+        html {
+            font-size: 2vw;
+        }
+
+        .napis {
+      font-size: 2vw;
+  }
+  #lmao {
+    font-size: 2vw;
+  }
+        
+      }
+
+ 
+
+      
+
+      .name {
+        grid-area: second;
+      }
+
+      .name-text {
+        grid-area: third;
+        /* min-width: 30vw; */
+      }
+
+      .email {
+        grid-area: fourth;
+      }
+
+      .email-text {
+        grid-area: fifth;
+        /* min-width: 30vw; */
+      }
+
+      
+      .send{
+        display: flex;
+        justify-content: center;
+        width: 150wm;
+        height: 4rem;
+        margin: 8px 0 8px 0px; 
+        align-items: center;
+        grid-area: seventh;
+        background-color: aqua;
+      }
+
+      .reason-text {
+        grid-area: eighth;
+      }
+
+      .text {
+        grid-area: sixth;
+      }
+
+      .newsletter {
+        grid-area: ninth;
+      }
+
+      .clear {
+        grid-area: tenth;
+        display: flex;
+        justify-content: center;
+        width: 150wm;
+        height: 4rem;
+        margin: 8px 0 8px 0px; 
+        align-items: center;
+      }
+
+      .surname {
+        grid-area: eleventh;
+      }
+
+      .surname-text {
+        grid-area: twelfth;
+        /* min-width: 30vw; */
+      }
+
+      .phone {
+        grid-area: thirteenth;
+      }
+      
+      .phone-text {
+        grid-area: fourteenth;
+        /* min-width: 30vw; */
+      }
+
+      .reason {
+        grid-area: fifteenth;
+      }
+
+      
+
+
+    
+@media (pointer: fine) {
+        input[type="checkbox"] {
+        width: 0.8rem;
+       height: 0.8rem;
+     }
+    }
+  
+  @media (pointer: coarse) {
+    input[type="checkbox"] {
+      width: 1.8rem;
+      height:1.8rem;
+
+    }
+  }
+
+  
+
+  .napis2 {
+    font-size: 4vw;
+  }
+
+  .napis3 {
+    font-size: 1vw;
+  }
+
+
+  
+
+    </style>
+  </head>
+  <body>
+    <div class="content">
+    <div class="containerf">
+        <h1 style="text-align:center">Skontaktuj się z nami!</h1>
+        <form class="container">
+            <label class="name" id="lmao" >Imię*:</label>
+            <input class="name-text" id="lmao" name="name" required minlength="1" />
+            <label class="surname" id="lmao" >Nazwisko:</label>
+            <input class="surname-text" id="lmao" name="surname" />
+            <label class="email" id="lmao" >Email*:</label>
+            <input class="email-text" id="lmao" name="email" required pattern="\S+@\S+\.\S+" />
+            <label class="phone" id="lmao" >Numer tel.:</label>
+            <input class="phone-text" id="lmao" name="phone" pattern="^\d{9}$" />
+            <label class="reason" id="lmao" >Powód*:</label>
+            <select required id="lmao" class="reason-text napis3" name="Powód">
+                <option value="">-</option>
+                <option value="SZEF">Pytanie do szefa.</option>
+                <option value="zdrowie">Problemy zdrowotne.</option>
+                <option value="psycho">Problemy psychiczne.</option>
+                <option value="lmao">Problemy natury nadludzkiej</option>
+                <option value="xd">Jestem głodny.</option>
+                <option value="lol">Inne</option>
+            </select>
+            <textarea class="text" id="lmao" name="Komentarz" cols="50" rows="10" required="required"></textarea>
+            <div class="newsletter" ><input type="checkbox" name="newsletter">Subskrybuj newsletter </div>
+            <button class="send napis" type="submit">Wyślij formularz</p></button>
+            <button class="clear napis" type="reset">Wyczyść dane</p></button>
+        </div>
+    </form>
+  </div>
+  </body>

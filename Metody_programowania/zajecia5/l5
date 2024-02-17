@@ -1,0 +1,193 @@
+#lang plait
+
+;zad.1.
+
+;('a 'b - > 'a )
+(define (F1 a b)
+  a)
+
+
+;(('a 'b - > 'c ) ('a - > 'b ) 'a - > 'c )
+(define (F2 f1 f2 a)
+  (f1 a (f2 a)))
+
+
+;((( 'a - > 'a ) - > 'a ) - > 'a )
+
+(define (F3 [f : (('a -> 'a) -> 'a)])
+  (f (lambda (x) x )))
+
+
+;(('a - > 'b ) ('a - > 'c ) - > ('a - > ('b * 'c ) ) )
+
+
+(define (F4 f1 f2)
+  (lambda (x) (pair (f1 x) (f2 x))))
+
+
+;(('a - > ( Optionof ('a * 'b ) ) ) 'a - > ( Listof 'b ) )
+
+(define (F5 [f : ('a -> (Optionof ('a * 'b)))] x)
+  (snd (some-v (f x))))
+
+
+;zad.2.
+
+( define ( apply f x ) ( f x ) )
+;(('a -> 'b) 'a -> 'b)
+
+
+( define ( compose f g ) ( lambda ( x ) ( f ( g x ) ) ) )
+;(('a -> 'b) ('c -> 'a) -> ('c -> 'b))
+
+
+( define ( flip f ) ( lambda ( x y ) ( f y x ) ) )
+;(('a 'b -> 'c) -> ('b 'a -> 'c))
+
+
+( define ( curry f ) ( lambda ( x ) ( lambda ( y ) ( f x y ) ) ) )
+;(('a 'b -> 'c) -> ('a -> ('b -> 'c)))
+
+
+;zad.3.
+
+;( curry compose )
+;(('_a -> '_b) -> (('_c -> '_a) -> ('_c -> '_b)))
+
+
+;(( curry compose ) ( curry compose ) )
+;(('_a -> ('_b -> '_c)) -> ('_a -> (('_d -> '_b) -> ('_d -> '_c))))
+
+
+;(( curry compose ) ( curry apply ) )
+;(('_a -> ('_b -> '_c)) -> ('_a -> ('_b -> '_c)))
+
+;(( curry apply ) ( curry compose ) )
+;(('_a -> '_b) -> (('_c -> '_a) -> ('_c -> '_b)))
+
+;( compose curry flip )
+;(('_a '_b -> '_c) -> ('_b -> ('_a -> '_c)))
+
+;zad.4.
+
+;(define (permutation1 alst)
+ ; (cond
+  ;  [(= (length alst) 1) alst]
+   ; [(= (length alst) 2)
+    ; (append alst (reverse alst))]
+    ;[else (local
+     ;       [(define (permute-tail p)
+      ;         (local
+       ;          [(define (consp lst)(cons p lst))
+        ;          (define (notp elem)(not (equal? p elem)))]
+         ;        (map consp (permutation1 (filter notp alst)))))]
+          ;  (foldr append empty (map permute-tail alst))
+           ; )]
+    ;)
+  ;)
+
+;zad.5.
+(define-type (Tree 'a)
+  (leaf)
+  (node [l : (Tree 'a)] [elem : 'a] [r : (Tree 'a)]))
+
+(define example-tree
+  (node (node (leaf) (pair 1 "foo") (leaf))
+        (pair 2 "bar")
+        (node (leaf) (pair 3 "baz") (leaf))))
+
+;(('a 'b 'c 'b - > 'b ) ('a - > 'b ) ('a 'c - > 'a ) ('a 'c - > 'a )'a ( Tree 'c )- >'b )
+
+;(define (process-tree f g l r a t)
+  
+
+
+(define-type (Tree2 'a)
+  (leaf2)
+  (node2 [elem : 'a] [lista : (Listof (Tree2 'a))]))
+
+(define example-tree2
+  (node2 (pair 2 "bar")
+        (list (node2 (pair 1 "chuj") (list (leaf2))))))
+
+(define-type (roseTree 'a)
+  (rleaf [elem : 'a])
+  (rnode [lista : (Listof (roseTree 'a))]))
+
+(define example-tree3
+  (rnode (list (rnode (list (rleaf 1) (rleaf 2) (rleaf 3))) (rnode (list (rleaf 4))))))
+
+
+
+(define (inorder t)
+  (local[(define (bar l xs)
+    (cond[(empty? l)
+         xs]
+         [(empty? (rest l))
+          (foo (first l) xs)]
+         [else (bar (rest l) xs)]))
+         
+  (define (foo t xs)
+    (if (rleaf? t)
+        (append (rleaf-elem t) xs)
+        (bar (rnode-lista t) xs)))]
+  (foo t (list))))
+        
+       
+
+;zad.7.
+
+( define-type Prop
+( var [ v : String ])
+( conj [ l : Prop ] [ r : Prop ])
+( disj [ l : Prop ] [ r : Prop ])
+( neg [ f : Prop ]) )
+
+(define (check v xs)
+  (if (empty? xs)
+      #t
+  (if (equal? (first xs) v)
+      #f
+      (check v (rest xs)))))
+
+(define (free-vars f)
+  (local [(define (iter f xs)
+    (cond [(neg? f)   (iter (neg-f f) xs)]
+          [(disj? f)  (iter (disj-r f) (iter (disj-l f) xs))]
+          [(conj? f)  (iter (conj-r f) (iter (conj-l f) xs))]
+          [(check (var-v f) xs) (append xs (list (var-v f)))]
+          [else xs]))]
+  (iter f (list))))
+
+(define my-prop
+  (conj (var "p") (disj (var "q") (neg (var "r")))))
+
+;zad.8.
+
+
+(define (eval f sigma)
+  (cond [(var? f) (some-v (hash-ref sigma (var-v f)))]
+        [(conj? f) (and (eval (conj-l f)  sigma)
+                        (eval (conj-r f) sigma))]
+        [(disj? f) (or  (eval (disj-l f)  sigma)
+                        (eval (disj-r f) sigma))]
+        [(neg? f)  (not (eval (neg-f f)   sigma))]))
+
+(define w (hash (list (pair "p" #t) (pair "q" #f) (pair "r" #f))))
+(define a (eval my-prop w))
+
+;zad.9.
+
+(define (gen-vals xs)
+  (if (empty? xs)
+      (list)
+      (let* ([vss (gen-vals (rest xs))]
+             [x   (first xs)]
+             [vst (map (lambda (vs) (cons (pair x #t)  vs)) vss)]
+             [vsf (map (lambda (vs) (cons (pair x #f) vs)) vss)])
+        (append vst vsf))))
+
+(define (foo n xs ys)
+  (if (empty? xs)
+      ys
+      (foo (rest xs) (append (modulo (first xs) 2

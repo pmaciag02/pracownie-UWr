@@ -1,0 +1,20 @@
+<h1>Nazwa Sklepu</h1>
+<nav>
+    <ul>
+        <li><a href="/">Strona Główna</a></li>
+        <li><a href="/produkty">Produkty</a></li>
+        <li><a href="/szukaj">Szukaj</a></li>
+        <%if(!login){%>
+            <li><a href="/login">Zaloguj się</a></li>
+            <li><a href="/register">Zarejestruj się</a></li>
+        <%} else { %>
+            <li><a href="/koszyk">Koszyk</a></li>
+            <% if (admin) { %>
+                <li><a href="/manage-products">Zarządzaj produktami</a></li>
+                <li><a href="/manage-users">Zarządzaj użytkownikami</a></li>
+                <li><a href="/show-orders">Przeglądaj zamówienia</a></li>
+            <%} %>
+            <li><a href="/logout">Wyloguj się</a></li>
+        <% } %>
+    </ul>
+</nav>

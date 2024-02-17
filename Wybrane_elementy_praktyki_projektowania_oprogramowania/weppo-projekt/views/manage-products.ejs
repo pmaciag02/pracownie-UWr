@@ -1,0 +1,46 @@
+<!-- products.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie produktami - Nazwa Sklepu</title>
+    <link rel="stylesheet" href="/style.css">
+    <%- include('product-description', locals) %>
+</head>
+<body>
+
+<header>
+    <%- include('header', locals) %>
+</header>
+
+<main>
+    <section class="product-list">
+        <h2>Produkty</h2>
+            <button onclick=<%= `window.location.href='/dodaj-produkt'` %>>Dodaj nowy produkt</button>
+
+            <% result.rows.forEach(r => { %>
+                <div class="product">
+                    <h3> <%= r.name %> </h3>
+                    <p>Cena: <%= r.price %></p>
+
+                    <p class="pokaz-opis" onclick="pokazOpis('<%= r.id %>')">Opis produktu</p>
+                    <div class="opis-produktu" id='<%= r.id %>'>
+                        <p><%= r.description %></p>
+                    </div>
+
+                    <button onclick=<%= `window.location.href='/edytuj-produkt/${r.id}'` %>>Edytuj</button>
+                    <button onclick=<%= `window.location.href='/usun-produkt/${r.id}'` %>>Usuń</button>
+                </div>
+            <% }); %>
+
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Nazwa Sklepu. Wszelkie prawa zastrzeżone.</p>
+</footer>
+
+</body>
+</html>

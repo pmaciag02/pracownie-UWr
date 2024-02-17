@@ -1,0 +1,47 @@
+
+Wykorzystany czas	7 dni 22 godzin
+Ocena	15,00 pkt. na 15,00 pkt. możliwych do uzyskania (100%)
+Informacja zwrotna	
+Program poprawnie wykonał wszystkie testy.
+
+Pytanie 1
+Poprawnie
+Punkty: 15,00 z 15,00
+Nie oznaczony flagąOflaguj pytanie
+Treść pytania
+Zliczanie referencji
+W tym zadaniu będziemy zajmować się (nieetykietowanymi) drzewami binarnymi. Do ich obsługi będziemy używać trzech zmiennych: 𝚡, 𝚢, 𝚣, które początkowo mają wartość pustego drzewa. Na wejściu podanych będzie n instrukcji zmieniających wartości zmiennych na cztery sposoby: konstruującej, dwóch dekonstruujących i zerującej (nadającą wartość pustego drzewa).
+
+W pierwszej linii wejścia podana jest liczba naturalna n (0 ⩽ n ⩽ 10000). W następnych n liniach podane są instrukcje postaci a := v, gdzie a to 𝚡, 𝚢 lub 𝚣, a v jest jedną z instrukcji, które ustawiają wartość zmiennej a na:
+
+𝚗𝚞𝚕𝚕 — puste drzewo,
+𝚌𝚘𝚗𝚜 b c — drzewo o nowo zaalokowanym korzeniu, którego lewym poddrzewem jest wartość zmiennej b, a prawym — wartość zmiennej c,
+𝚌𝚊𝚛 d — drzewo, które jest lewym poddrzewem wartości zmiennej d,
+𝚌𝚍𝚛 e — drzewo, które jest prawym poddrzewem wartości zmiennej e.
+Instrukcje 𝚌𝚊𝚛 i 𝚌𝚍𝚛 nie będą podawane dla pustych drzew. Powyższe instrukcje same w sobie działają w czasie stałym, a więc reprezentowane przez nie drzewa nie są kopiowane, a współdzielone.
+
+Przed wczytaniem pierwszej instrukcji i po wczytaniu każdej instrukcji (czyli n + 1 razy) należy wypisać stan systemu postaci:
+𝚛𝚘𝚞𝚗𝚍: r, 𝚡: x, 𝚢: y, 𝚣: z, 𝚌𝚎𝚕𝚕𝚜: c
+gdzie:
+
+r jest liczbą wykonanych instrukcji,
+x, y, z są numerami instrukcji, które zaalokowały korzeń drzewa przechowywanego przez odpowiednio 𝚡, 𝚢, 𝚣, lub zerem, jeśli zmienna przechowuje puste drzewo,
+c jest liczbą zaalokowanych węzłów, które są osiągalne ze zmiennych 𝚡, 𝚢, 𝚣.
+ Przykład
+Dla wejścia:
+
+4
+x := cons x x
+y := cons x x
+x := null
+y := car y
+program powinien wypisać:
+
+round: 0, x: 0, y: 0, z: 0, cells: 0
+round: 1, x: 1, y: 0, z: 0, cells: 1
+round: 2, x: 1, y: 2, z: 0, cells: 2
+round: 3, x: 0, y: 2, z: 0, cells: 2
+round: 4, x: 0, y: 1, z: 0, cells: 1
+Wyjaśnienie. Pierwsza instrukcja ustawia wartość zmiennej 𝚡 na drzewo, którego poddrzewa są puste, druga — wartość zmiennej 𝚢 na drzewa, którego poddrzewami są drzewa reprezentowane przez 𝚡. Trzecia instrukcja ustawia wartość 𝚡 na puste drzewo, ale komórka zaalokowana przez pierwszą instrukcję jest nadal osiągalna z 𝚢. Czwarta instrukcja ustawia wartość 𝚢 na wartość, którą pierwsza instrukcja nadawała zmiennej 𝚡. Wtedy komórka zaalokowana przez drugą instrukcję przestaje być osiągalna.
+
+Wskazówka. O nieosiągalnych komórkach możemy myśleć, że zostają automatycznie zdealokowane (odśmiecone). Wskazania na poddrzewa nigdy nie utworzą cyklu, więc do określenia osiągalności komórki wystarczy pamiętać liczbę wskazań na nią przez zaalokowane komórki. Jeśli liczba wskazań spada do zera, komórka staje się nieosiągalna.

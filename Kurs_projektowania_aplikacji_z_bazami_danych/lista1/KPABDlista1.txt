@@ -1,0 +1,155 @@
+ZAD1
+SELECT DISTINCT [SalesLT].[Address].City
+FROM [SalesLT].[Address]
+JOIN [SalesLT].[SalesOrderHeader] ON [SalesLT].[Address].AddressID = [SalesLT].[SalesOrderHeader].ShipToAddressID
+WHERE [SalesLT].[SalesOrderHeader].ShipDate IS NOT NULL
+ORDER BY [SalesLT].[Address].City;
+
+
+
+
+
+
+ZAD2
+SELECT [SalesLT].[ProductModel].Name, COUNT([SalesLT].[Product].ProductModelID) AS Counter
+FROM [SalesLT].[ProductModel], [SalesLT].[Product]
+WHERE [SalesLT].[ProductModel].[ProductModelID] = [SalesLT].[Product].[ProductModelID]
+GROUP BY [SalesLT].[ProductModel].Name
+HAVING COUNT([SalesLT].[Product].ProductModelID) > 1
+
+
+
+
+
+ZAD3
+
+SELECT 
+    [SalesLT].[Address].City, 
+    COUNT([SalesLT].[CustomerAddress].CustomerID) AS "Number of customers",
+    COUNT(DISTINCT [SalesLT].[Customer].SalesPerson) AS "Number of salespersons"
+FROM [SalesLT].[Address] 
+JOIN [SalesLT].[CustomerAddress] ON [SalesLT].[Address].AddressID = [SalesLT].[CustomerAddress].AddressID 
+JOIN [SalesLT].[Customer] ON [SalesLT].[Customer].CustomerID = [SalesLT].[CustomerAddress].CustomerID
+GROUP BY [SalesLT].[Address].City
+
+
+
+
+
+ZAD5.a
+
+SELECT 
+    [SalesLT].[SalesOrderHeader].SalesOrderID,
+    [SalesLT].[SalesOrderHeader].SalesOrderNumber,
+    [SalesLT].[SalesOrderHeader].PurchaseOrderNumber,
+    SUM([SalesLT].[SalesOrderDetail].LineTotal) AS TotalWithDiscount,
+    SUM([SalesLT].[SalesOrderDetail].OrderQty * [SalesLT].[SalesOrderDetail].UnitPrice) AS TotalWithoutDiscount,
+    SUM([SalesLT].[SalesOrderDetail].LineTotal) + [SalesLT].[SalesOrderHeader].TaxAmt + [SalesLT].[SalesOrderHeader].Freight AS WholeOrder
+FROM [SalesLT].[SalesOrderHeader] JOIN [SalesLT].[SalesOrderDetail]
+ON [SalesLT].[SalesOrderHeader].SalesOrderID = [SalesLT].[SalesOrderDetail].SalesOrderID
+
+GROUP BY [SalesLT].[SalesOrderHeader].SalesOrderID, [SalesLT].[SalesOrderHeader].SalesOrderNumber, [SalesLT].[SalesOrderHeader].PurchaseOrderNumber, [SalesLT].[SalesOrderHeader].TaxAmt, [SalesLT].[SalesOrderHeader].Freight;
+
+
+
+
+
+
+ZAD5.b
+WITH Orders AS (
+    SELECT 
+        [SalesLT].[SalesOrderHeader].SalesOrderID,
+        [SalesLT].[SalesOrderHeader].SalesOrderNumber,
+        [SalesLT].[SalesOrderHeader].PurchaseOrderNumber,
+        SUM([SalesLT].[SalesOrderDetail].LineTotal) AS TotalWithDiscount,
+        SUM([SalesLT].[SalesOrderDetail].OrderQty * [SalesLT].[SalesOrderDetail].UnitPrice) AS TotalWithoutDiscount,
+        SUM([SalesLT].[SalesOrderDetail].LineTotal) + [SalesLT].[SalesOrderHeader].TaxAmt + [SalesLT].[SalesOrderHeader].Freight AS WholeOrder,
+        SUM([SalesLT].[SalesOrderDetail].LineTotal) AS TotalDiscount
+    FROM [SalesLT].[SalesOrderHeader] JOIN [SalesLT].[SalesOrderDetail]
+    ON [SalesLT].[SalesOrderHeader].SalesOrderID = [SalesLT].[SalesOrderDetail].SalesOrderID
+
+    GROUP BY [SalesLT].[SalesOrderHeader].SalesOrderID, [SalesLT].[SalesOrderHeader].SalesOrderNumber, [SalesLT].[SalesOrderHeader].PurchaseOrderNumber, [SalesLT].[SalesOrderHeader].TaxAmt, [SalesLT].[SalesOrderHeader].Freight
+
+)
+
+
+
+SELECT TOP 1 
+    SalesOrderID,
+    SalesOrderNumber,
+    PurchaseOrderNumber,
+    TotalWithDiscount,
+    TotalWithoutDiscount,
+    WholeOrder
+FROM Orders
+ORDER BY TotalDiscount DESC;
+
+
+
+
+
+
+ZAD6
+
+SELECT [SalesLT].[Customer].LastName, [SalesLT].[Customer].FirstName, SUM([SalesLT].[SalesOrderDetail].UnitPriceDiscount * [SalesLT].[SalesOrderDetail].UnitPrice * [SalesLT].[SalesOrderDetail].OrderQty) AS Savings
+FROM [SalesLT].[Customer], [SalesLT].[SalesOrderDetail], [SalesLT].[SalesOrderHeader]
+WHERE [SalesLT].[Customer].CustomerID = [SalesLT].[SalesOrderHeader].CustomerID AND [SalesLT].[SalesOrderHeader].SalesOrderID = [SalesLT].[SalesOrderDetail].SalesOrderID
+GROUP BY [SalesLT].[Customer].FirstName, [SalesLT].[Customer].LastName
+ORDER BY Savings DESC
+
+
+
+
+
+ZAD7.
+
+CREATE TABLE Test (
+    ID INT IDENTITY(1000, 10) PRIMARY KEY,
+    name VARCHAR(10)
+);
+
+INSERT INTO Test(name)
+VALUES('Jan')
+
+INSERT INTO Test(name)
+VALUES('Basia')
+
+
+SELECT @@IDENTITY AS LastIdentity;
+
+
+SELECT IDENT_CURRENT('Test') AS CurrentIdentity;
+
+--SELECT * FROM TEST
+
+--DROP TABLE Test
+
+
+
+
+ZAD8.
+
+INSERT INTO [SalesLT].[SalesOrderHeader](ShipDate, OrderDate, DueDate, CustomerID, ShipMethod)
+VALUES('2008-06-08 00:00:00.000', '2008-06-09 00:00:00.000', '2008-06-08 00:00:00.000', 98989, 'CARGO TRANSPORT 5' )
+
+
+
+
+
+
+ZAD9.
+
+ALTER TABLE SalesLT.Customer
+ADD CreditCardNumber NVARCHAR(16); 
+
+UPDATE TOP (3) SalesLT.SalesOrderHeader
+SET CreditCardApprovalCode = 'Code'
+WHERE CreditCardApprovalCode IS NULL;
+
+UPDATE SalesLT.Customer
+SET CreditCardNumber = 'X'
+FROM SalesLT.Customer
+JOIN SalesLT.SalesOrderHeader ON SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+WHERE SalesLT.SalesOrderHeader.CreditCardApprovalCode IS NOT NULL;
+
+

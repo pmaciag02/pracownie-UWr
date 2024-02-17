@@ -1,0 +1,60 @@
+Ludzie w windzie
+
+Winda (o maksymalnej pojemności m osób) jeździ cyklicznie w górę i w dół (z parteru na ostatnie piętro i z ostatniego piętra na parter).
+Na piętrze i (0<=i<n) najpierw Wi osób chce opuścić windę (jeżeli osób w windzie jest mniej wysiadają wszystkie), a następnie Ni osób chce wsiąść do windy (zachowując maksymalną możliwą ilość osób w windzie). Winda wykonuje łącznie s ruchów.
+Ile osób zostanie w windzie po wyjściu osób na ostatnim odwiedzonym piętrze i które to będzie piętro (zakładając że piętro numer 0 to parter)? Uwaga na ostatnim odwiedzonym piętrze ludzie tylko wychodzą.
+
+Dane wejściowe:
+
+m - maksymalna pojemność windy
+
+s - ilość ruchów windy
+
+n - ilość pięter (wliczając parter), 1<n<=1000
+
+w n kolejnych wierszach
+
+Ni Wi - Ni ilość osób chcących wejść do windy, Wi - ilość osób chcących ją opuścić
+
+Wyjście:
+
+l o
+
+gdzie:
+
+l to numer ostatniego odwiedzonego piętra
+
+o ilość osób pozostałych w windzie po wyjściu osób na tym piętrze
+
+ 
+
+Przykład:
+
+ 
+
+wejście:
+
+3
+
+2
+
+3
+
+5 0
+
+2 3
+
+5 1
+
+ 
+
+wyjście:
+2 1
+
+ 
+
+Winda pomieści maksymalnie 3 osoby.
+Na parterze wsiadają 3 osoby
+Na pierwszym piętrze wysiadają 3 osoby i wsiadają 2
+Na drugim piętrze wysiada 1 osoba
+W windzie na 2 piętrze pozostaje jedna osoba.

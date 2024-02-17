@@ -1,0 +1,326 @@
+ZAD1
+
+DROP TRIGGER IF EXISTS [SalesLT].ModifiedDateUpdate
+GO
+
+
+CREATE TRIGGER ModifiedDateUpdate ON [SalesLT].[Customer] AFTER UPDATE
+AS
+BEGIN
+    UPDATE [SalesLT].[Customer]
+    SET ModifiedDate = GETDATE()
+    FROM [SalesLT].[Customer] JOIN inserted ON [SalesLT].[Customer].CustomerID = inserted.CustomerID
+END
+GO
+
+
+
+UPDATE [SalesLT].[Customer] SET Title = 'Ms.' WHERE CustomerID = 1
+GO
+
+
+
+
+
+
+ZAD2
+
+
+DROP TABLE IF EXISTS CostAndPriceHistory
+GO
+
+
+
+
+CREATE TABLE CostAndPriceHistory (
+    ProductID INT,
+    StandardCost MONEY,
+    ListPrice MONEY,
+    StartDate DATETIME,
+    EndDate DATETIME,
+    Ending DATETIME
+)
+GO
+
+
+
+
+
+DROP TRIGGER IF EXISTS [SalesLT].[CostAndPriceHistoryTrigger]
+GO
+
+
+CREATE TRIGGER CostAndPriceHistoryTrigger ON [SalesLT].[Product] AFTER UPDATE
+AS
+BEGIN
+    DECLARE @date DATETIME = GETDATE()
+    INSERT INTO CostAndPriceHistory (ProductID, StandardCost, ListPrice, StartDate, EndDate, Ending)
+    SELECT inserted.ProductID, deleted.StandardCost, deleted.ListPrice, @date, NULL, [SalesLT].[Product].SellEndDate
+    FROM inserted JOIN deleted ON inserted.ProductID = deleted.ProductID JOIN [SalesLT].[Product] ON inserted.ProductID = [SalesLT].[Product].ProductID
+    WHERE (NOT inserted.StandardCost = deleted.StandardCost OR NOT inserted.ListPrice = deleted.ListPrice) AND [SalesLT].[Product].SellEndDate > @date
+END
+GO
+
+
+
+
+update [SalesLT].[Product] set SellEndDate = '01/01/2024 00:00:00' where ProductID = 680
+go
+
+update [SalesLT].[Product] set SellEndDate = '01/01/2024 00:00:00' where ProductID = 706
+go
+
+update [SalesLT].[Product] set SellEndDate = '01/01/2024 00:00:00' where ProductID = 707
+go
+
+
+
+
+update [SalesLT].[Product] set StandardCost = 69 where ProductID = 706
+go
+
+update [SalesLT].[Product] set Color = 'Red' where ProductID = 680
+go
+
+update [SalesLT].[Product] set ListPrice = 42 where ProductID = 707
+go
+
+update [SalesLT].[Product] set StandardCost = 70 where ProductID = 706
+go
+
+
+SELECT ProductID, StandardCost, ListPrice, StartDate, EndDate, Ending
+FROM CostAndPriceHistory
+ORDER BY ProductID, StartDate, EndDate
+GO
+
+
+
+
+
+
+
+
+
+DECLARE @ProductID INT, @StandardCost MONEY, @ListPrice MONEY, @StartDate DATETIME, @EndDate DATETIME, @Ending DATETIME
+DECLARE @prevProductID INT, @prevStandardCost MONEY, @prevListPrice MONEY, @prevStartDate DATETIME, @prevEndDate DATETIME, @prevEnding DATETIME
+
+DECLARE i CURSOR FOR SELECT ProductID, StandardCost, ListPrice, StartDate, EndDate, Ending FROM CostAndPriceHistory ORDER BY ProductID, StartDate, EndDate
+
+OPEN i;
+
+FETCH NEXT FROM i INTO @ProductID, @StandardCost, @ListPrice, @StartDate, @EndDate, @Ending
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @prevProductID = @ProductID
+    SET @prevStandardCost = @StandardCost
+    SET @prevListPrice = @ListPrice
+    SET @prevStartDate = @StartDate
+    SET @prevEndDate = @EndDate
+    SET @prevEnding = @Ending
+
+    FETCH NEXT FROM i INTO @ProductID, @StandardCost, @ListPrice, @StartDate, @EndDate, @Ending
+    
+    IF (@@FETCH_STATUS = 0)
+    BEGIN
+    IF (@prevProductID = @ProductID)
+    BEGIN
+        UPDATE CostAndPriceHistory SET EndDate = @StartDate WHERE ProductID = @prevProductID AND StartDate = @prevStartDate
+    END
+    ELSE
+    BEGIN
+        UPDATE CostAndPriceHistory SET EndDate = @prevEnding WHERE ProductID = @prevProductID AND StartDate = @prevStartDate
+    END
+
+    END
+    ELSE
+    BEGIN
+        UPDATE CostAndPriceHistory SET EndDate = @prevEnding WHERE ProductID = @prevProductID AND StartDate = @prevStartDate
+    END
+
+
+
+END
+CLOSE i;
+DEALLOCATE i;
+GO
+
+
+SELECT ProductID, StandardCost, ListPrice, StartDate, EndDate
+FROM CostAndPriceHistory
+ORDER BY ProductID, StartDate, EndDate
+GO
+
+
+
+
+
+
+
+
+
+
+
+ZAD3
+
+DROP TABLE IF EXISTS brand_approvals
+DROP TABLE IF EXISTS brands
+DROP VIEW IF EXISTS vw_brands
+DROP TRIGGER IF EXISTS trg_vw_brands
+GO
+
+
+
+CREATE TABLE brand_approvals(
+    brand_id INT IDENTITY PRIMARY KEY,
+    brand_name VARCHAR(255) NOT NULL
+)
+GO
+
+CREATE TABLE brands(
+    brand_id INT IDENTITY PRIMARY KEY,
+    brand_name VARCHAR(255) NOT NULL,
+)
+GO
+
+
+
+
+CREATE VIEW vw_brands 
+AS
+SELECT
+    brand_name,
+    'Approved' approval_status
+FROM
+    brands
+UNION
+SELECT
+    brand_name,
+    'Pending Approval' approval_status
+FROM
+    brand_approvals;
+GO
+
+
+
+
+
+
+
+CREATE TRIGGER trg_vw_brands 
+ON vw_brands
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO brand_approvals (brand_name)
+    SELECT
+        i.brand_name
+    FROM
+        inserted i
+    WHERE
+        i.brand_name NOT IN (
+            SELECT 
+                brand_name
+            FROM
+                brands
+        );
+END
+GO
+
+INSERT INTO vw_brands(brand_name) VALUES('Eddy Merckx')
+GO
+
+SELECT brand_name, approval_status FROM vw_brands;
+GO
+
+
+SELECT * FROM brand_approvals;
+GO
+
+
+
+
+
+
+
+
+ZAD6
+
+
+
+DROP TABLE IF EXISTS Cache
+DROP TABLE IF EXISTS History
+DROP TABLE IF EXISTS Parameters
+GO
+
+CREATE TABLE Cache(ID INT IDENTITY PRIMARY KEY, UrlAddress VARCHAR(100), LastAccess DATETIME)
+CREATE TABLE History(ID INT IDENTITY PRIMARY KEY, UrlAddress VARCHAR(100), LastAccess DATETIME)
+CREATE TABLE Parameters(Name VARCHAR(10),  Value INT)
+GO
+
+INSERT INTO Parameters VALUES('max_cache', 2)
+GO
+
+
+DROP TRIGGER IF EXISTS toHistory
+GO
+
+
+CREATE TRIGGER toHistory ON Cache INSTEAD OF INSERT
+AS
+BEGIN
+    DECLARE @I_UrlAddress varchar(100), @I_LastAccess DATETIME;
+    DECLARE ins CURSOR FOR SELECT UrlAddress, LastAccess FROM INSERTED
+
+    OPEN ins;
+
+    FETCH NEXT FROM ins INTO @I_UrlAddress, @I_LastAccess;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+	    IF EXISTS (SELECT 1 FROM Cache WHERE UrlAddress = @I_UrlAddress)
+        BEGIN
+		    UPDATE Cache SET LastAccess = @I_LastAccess WHERE UrlAddress = @I_UrlAddress;
+        END
+	    ELSE
+	    BEGIN
+		    IF ((SELECT COUNT(*) FROM Cache) < (SELECT TOP 1  Value FROM Parameters))
+            BEGIN
+			    INSERT INTO Cache VALUES(@I_UrlAddress, @I_LastAccess)
+            END
+		    ELSE
+		    BEGIN
+			    DECLARE @CacheID INT, @CacheUrlAddress varchar(100), @CacheLastAccess DATETIME
+			    SELECT TOP 1 @CacheID = ID, @CacheUrlAddress = UrlAddress, @CacheLastAccess = LastAccess FROM Cache ORDER BY LastAccess
+
+			    IF EXISTS (SELECT 1 FROM History WHERE UrlAddress = @CacheUrlAddress)
+                BEGIN
+				    UPDATE History SET LastAccess = @CacheLastAccess WHERE UrlAddress = @CacheUrlAddress
+			    END
+                ELSE
+                BEGIN
+				    INSERT INTO History VALUES(@CacheUrlAddress, @CacheLastAccess)
+                END
+
+			    DELETE FROM Cache WHERE ID = @CacheID
+			    INSERT INTO Cache VALUES(@I_UrlAddress, @I_LastAccess)
+		    END
+	    END
+
+        FETCH NEXT FROM ins INTO @I_UrlAddress, @I_LastAccess
+    END
+    CLOSE ins
+    DEALLOCATE ins
+END	
+GO
+
+INSERT INTO Cache VALUES('https://skos.ii.uni.wroc.pl/', '06/11/2023 00:00:00'), ('https://skos.ii.uni.wroc.pl/', '06/11/2023 00:01:00'), ('https://www.sqlservertutorial.net/', '06/11/2023 00:00:00'), ('https://portal.azure.com/', '06/11/2023 00:00:00')
+
+
+SELECT * FROM Cache
+SELECT * FROM History
+GO
+
+

@@ -1,0 +1,51 @@
+Zaprojektuj i zaimplementuj strukturę, która umożliwi przechowywanie listy liczb całkowitych L i wykonywanie na niej opisanych poniżej operacji. Niech length(L) oznacza aktualną długość listy; pozycje na liście numerowane są od 1 do length(L).
+
+Insert(p, x). Wstawia liczbę całkowitą x do listy za p pierwszymi elementami listy, gdzie 0 <= p <= length(L). (Dla p = 0 element x wstawiony zostanie na początek listy, zaś dla p = length(L) na jej koniec).
+Delete(p). Usuwa liczbę całkowitą stojącą na miejscu p listy, gdzie 1 <= p <= length(L).
+Sum(p1, p2). Zwraca sumę elementów na pozycjach od p1 do p2 włącznie, gdzie 1 <= p1 <= p2 <= length(L).
+Specyfikacja danych wejściowych
+W pierwszym wierszu danych wejściowych znajduje się liczba naturalna N ∈ [1, 1000], oznaczająca liczbę operacj na liście L. Początkowo lista L jest pusta. W każdym z kolejnych N wierszy znajduje się opis jednej operacji wykonywanej na liście L.
+
+W przypadku operacji Insert(p, x) wiersz zawiera literę I, pojedynczy odstęp, liczbę całkowitą p, pojedynczy odstęp, i liczbę całkowitą x ∈ [−1000000, 1000000].
+W przypadku operacji Delete(p) wiersz zawiera literę D, pojedynczy odstęp i liczbę całkowitą p.
+W przypadku operacji Sum(p1, p2) wiersz zawiera literę S, pojedynczy odstęp, liczbę całkowitą p1, pojedynczy odstęp i liczbę całkowitą p2.
+Zakładamy, że opisane wyżej liczby p, p1 i p2 zawsze mają sens, tj. dotycza istniejących miejsc na liście.
+
+Specyfikacja danych wyjściowych
+Dla każdej operacji Sum(p1, p2) Twój program powinien wypisać jedną liczbę (każdą w osobnym wierszu)
+oznaczającą wartość sumy elementów na pozycjach od p1 do p2 włącznie.
+
+Przykład A
+Wejście:
+7
+I 0 1
+I 1 2
+I 2 3
+S 1 2
+S 2 3
+D 1
+S 1 2
+Wyjście:
+3
+5
+5
+
+Przykład B
+Wejście:
+3
+I 0 66
+S 1 1
+D 1
+Wyjście:
+66
+
+Przykład C
+Wejście:
+5
+I 0 1
+I 0 2
+I 0 3
+D 2
+S 1 2
+Wyjście:
+4

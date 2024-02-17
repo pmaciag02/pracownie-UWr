@@ -1,0 +1,46 @@
+<!-- cart.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koszyk - Nazwa Sklepu</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+    <%- include('header', locals) %>
+</header>
+
+<main>
+    <% if(!done) { %>
+    <section class="shopping-cart">
+        <h2>Koszyk</h2>
+
+        <% result.rows.forEach(r => { %>
+            <div class="cart-item">
+                <h3> <%= r.name %> </h3>
+                <p>Cena: <%= r.price %></p>
+                <!-- <p>Ilość: ???</p> -->
+                <button onclick=<%= `window.location.href='/koszyk-usun/${r.orderid}'` %>>Usuń z koszyka</button>
+            </div>
+        <% }); %>
+        <% if(result.rows.length > 0) { %>
+            <button onclick=<%= `window.location.href='/koszyk-zamow'` %> %>>Kupuję</button>
+        <% } %>
+        </section>
+    <% } else { %>
+        <h2>Zamówienie zostało złożone.</h2>
+        <h3>Całkowita cena: <%= price %></h3>
+    <% } %>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Nazwa Sklepu. Wszelkie prawa zastrzeżone.</p>
+</footer>
+
+</body>
+</html>
